@@ -1,1 +1,49 @@
-<p>header works!</p>
+<header class="h-16 shrink-0 bg-erp-card border-b border-erp-border shadow-erp-sm
+               flex items-center justify-between px-4 md:px-6 relative z-20">
+  <div class="flex items-center gap-3">
+    <button type="button" (click)="toggleSidebar.emit()"
+            class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-erp-primary hover:bg-erp-bg">
+      <app-icon name="bars-3" class="w-5 h-5"></app-icon>
+    </button>
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-lg bg-erp-primary flex items-center justify-center">
+        <app-icon name="cube" class="w-5 h-5 text-erp-bg"></app-icon>
+      </div>
+      <div class="hidden sm:block leading-tight">
+        <p class="text-sm font-semibold text-erp-primary">Mini ERP</p>
+        <p class="text-[11px] text-erp-primary/50">Gestión Comercial</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2 md:gap-4">
+    <button type="button" class="relative w-9 h-9 flex items-center justify-center rounded-lg text-erp-primary hover:bg-erp-bg">
+      <app-icon name="bell" class="w-5 h-5"></app-icon>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-erp-critical"></span>
+    </button>
+
+    <div class="relative">
+      <button type="button" (click)="userMenuOpen = !userMenuOpen"
+              class="flex items-center gap-2.5 pl-1 pr-2 py-1 rounded-lg hover:bg-erp-bg">
+        <div class="w-8 h-8 rounded-full bg-erp-secondary text-white flex items-center justify-center text-xs font-semibold">
+          {{ initials }}
+        </div>
+        <div class="hidden md:block text-left leading-tight">
+          <p class="text-sm font-medium text-erp-primary">{{ email }}</p>
+          <p class="text-[11px] text-erp-secondary">{{ role }}</p>
+        </div>
+        <app-icon name="chevron-down" class="w-4 h-4 text-erp-primary/40 hidden md:block"></app-icon>
+      </button>
+
+      <div *ngIf="userMenuOpen"
+           class="absolute right-0 mt-2 w-48 bg-erp-card border border-erp-border rounded-erp shadow-erp-md py-1.5 z-30">
+        <a class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-primary hover:bg-erp-bg cursor-pointer">Mi perfil</a>
+        <a class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-primary hover:bg-erp-bg cursor-pointer">Configuración</a>
+        <div class="my-1 border-t border-erp-border"></div>
+        <a (click)="logout()" class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-critical hover:bg-erp-critical/5 cursor-pointer">
+          Cerrar sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

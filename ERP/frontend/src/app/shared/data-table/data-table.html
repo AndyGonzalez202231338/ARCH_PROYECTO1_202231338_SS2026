@@ -1,1 +1,32 @@
-<p>data-table works!</p>
+<div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm overflow-hidden h-full flex flex-col">
+  <div class="flex items-center justify-between px-5 py-4 border-b border-erp-border">
+    <h3 class="text-sm font-semibold text-erp-primary">{{ title }}</h3>
+    <button *ngIf="showViewAll" type="button" class="text-xs text-erp-secondary hover:underline">Ver todo</button>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="text-left text-xs text-erp-primary/50 border-b border-erp-border">
+          <th *ngFor="let col of columns" class="px-5 py-3 font-medium whitespace-nowrap" [class.text-right]="col.align === 'right'">
+            {{ col.label }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows" class="border-b border-erp-border last:border-0 hover:bg-erp-bg/60 transition-colors">
+          <td *ngFor="let col of columns" class="px-5 py-3 text-erp-primary whitespace-nowrap" [class.text-right]="col.align === 'right'">
+            <span *ngIf="col.badgeMap; else plain" class="inline-flex px-2 py-1 rounded-full text-xs font-medium"
+                  [ngClass]="col.badgeMap[row[col.key]] || 'bg-erp-border/60 text-erp-primary/70'">
+              {{ row[col.key] }}
+            </span>
+            <ng-template #plain>{{ row[col.key] }}</ng-template>
+          </td>
+        </tr>
+        <tr *ngIf="!rows.length">
+          <td [attr.colspan]="columns.length" class="px-5 py-8 text-center text-erp-primary/40">Sin registros para mostrar</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,1 +1,19 @@
-<p>stats-card works!</p>
+<div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm p-5
+            hover:shadow-erp-md transition-shadow duration-150">
+  <div class="flex items-start justify-between">
+    <div class="w-10 h-10 rounded-lg bg-erp-secondary/10 flex items-center justify-center">
+      <app-icon [name]="icon" class="w-5 h-5 text-erp-secondary"></app-icon>
+    </div>
+
+    <span *ngIf="trend !== 'none'"
+          class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full"
+          [ngClass]="trend === 'up' ? 'bg-erp-secondary/10 text-erp-secondary' : 'bg-erp-critical/10 text-erp-critical'">
+      <app-icon [name]="trend === 'up' ? 'arrow-trending-up' : 'arrow-trending-down'" class="w-3.5 h-3.5"></app-icon>
+      {{ trendValue }}
+    </span>
+  </div>
+
+  <p class="mt-4 text-sm text-erp-primary/60">{{ title }}</p>
+  <p class="mt-1 text-2xl font-semibold text-erp-primary">{{ value }}</p>
+  <p *ngIf="subtitle" class="mt-1 text-xs text-erp-primary/50">{{ subtitle }}</p>
+</div>

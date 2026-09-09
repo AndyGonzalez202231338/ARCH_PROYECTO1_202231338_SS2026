@@ -1,1 +1,21 @@
-<p>alert-card works!</p>
+<div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm p-5 h-full">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-sm font-semibold text-erp-primary">{{ title }}</h3>
+    <span class="text-xs text-erp-primary/40">{{ alerts.length }} alertas</span>
+  </div>
+
+  <div class="space-y-3">
+    <div *ngFor="let alert of alerts" class="flex gap-3 pb-3 border-b border-erp-border last:border-0 last:pb-0">
+      <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0" [ngClass]="config(alert.type).classes">
+        <app-icon [name]="config(alert.type).icon" class="w-4 h-4"></app-icon>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-erp-primary">{{ alert.title }}</p>
+        <p class="text-xs text-erp-primary/60 mt-0.5">{{ alert.description }}</p>
+        <p class="text-[11px] text-erp-primary/40 mt-1">{{ alert.time }}</p>
+      </div>
+    </div>
+
+    <p *ngIf="!alerts.length" class="text-sm text-erp-primary/40 py-4 text-center">Sin alertas por el momento</p>
+  </div>
+</div>
