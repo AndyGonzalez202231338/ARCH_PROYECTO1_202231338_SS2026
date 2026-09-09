@@ -1,1 +1,16 @@
-<p>recent-activity works!</p>
+<div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm p-5 h-full">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-sm font-semibold text-erp-primary">Actividad reciente</h3>
+    <button type="button" class="text-xs text-erp-secondary hover:underline">Ver todo</button>
+  </div>
+
+  <ol class="relative border-l border-erp-border ml-3 space-y-5">
+    <li *ngFor="let item of items" class="ml-5">
+      <span class="absolute -left-[13px] w-6 h-6 rounded-full bg-erp-bg border border-erp-border flex items-center justify-center">
+        <app-icon [name]="item.icon" class="w-3.5 h-3.5 text-erp-secondary"></app-icon>
+      </span>
+      <p class="text-sm text-erp-primary"><span class="font-medium">{{ item.user }}</span> {{ item.action }}</p>
+      <p class="text-xs text-erp-primary/40 mt-0.5">{{ item.module }} &middot; {{ item.time }}</p>
+    </li>
+  </ol>
+</div>

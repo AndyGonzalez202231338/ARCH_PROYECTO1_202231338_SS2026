@@ -1,1 +1,35 @@
-<p>sidebar works!</p>
+<div *ngIf="open" (click)="close()" class="fixed inset-0 bg-erp-primary/30 z-30 lg:hidden"></div>
+
+<aside class="fixed lg:sticky top-0 left-0 h-screen w-64 bg-erp-primary text-white z-40
+               flex flex-col shrink-0 transition-transform duration-200 lg:translate-x-0"
+       [ngClass]="open ? 'translate-x-0' : '-translate-x-full'">
+
+  <div class="h-16 flex items-center gap-2.5 px-5 border-b border-white/10 shrink-0">
+    <div class="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center">
+      <app-icon name="cube" class="w-5 h-5 text-white"></app-icon>
+    </div>
+    <div class="leading-tight">
+      <p class="text-sm font-semibold">Mini ERP</p>
+      <p class="text-[11px] text-white/50">Gestión Comercial</p>
+    </div>
+    <button type="button" (click)="close()" class="ml-auto lg:hidden text-white/60">
+      <app-icon name="x-mark" class="w-5 h-5"></app-icon>
+    </button>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+    <a *ngFor="let item of menu"
+       [routerLink]="item.path"
+       routerLinkActive="bg-erp-secondary text-white"
+       [routerLinkActiveOptions]="{ exact: false }"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white/70
+              hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
+      <app-icon [name]="item.icon" class="w-5 h-5 shrink-0"></app-icon>
+      {{ item.label }}
+    </a>
+  </nav>
+
+  <div class="p-4 border-t border-white/10 text-[11px] text-white/40">
+    Sesión: {{ roleLabel }}
+  </div>
+</aside><p>sidebar works!</p>
