@@ -3,6 +3,9 @@ import { CanActivateFn } from '@angular/router';
 
 import { authGuard } from './auth-guard';
 
+/**
+ * Pruebas unitarias para el guardia de autenticación.
+ */
 describe('authGuard', () => {
   const executeGuard: CanActivateFn = (...guardParameters) => 
       TestBed.runInInjectionContext(() => authGuard(...guardParameters));

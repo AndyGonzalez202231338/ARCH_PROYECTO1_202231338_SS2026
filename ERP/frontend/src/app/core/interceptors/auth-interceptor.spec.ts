@@ -3,6 +3,9 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 import { authInterceptor } from './auth-interceptor';
 
+/**
+ * Pruebas unitarias para el interceptor de autenticación.
+ */
 describe('authInterceptor', () => {
   const interceptor: HttpInterceptorFn = (req, next) => 
     TestBed.runInInjectionContext(() => authInterceptor(req, next));

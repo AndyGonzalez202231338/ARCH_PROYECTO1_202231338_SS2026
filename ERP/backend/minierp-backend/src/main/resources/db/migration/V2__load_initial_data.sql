@@ -2,6 +2,19 @@
 -- Datos iniciales de prueba para el Mini ERP
 -- Password de todos los usuarios de prueba: password123
 
+ALTER SEQUENCE areas_id_seq RESTART WITH 1;
+ALTER SEQUENCE usuarios_id_seq RESTART WITH 1;
+ALTER SEQUENCE categorias_id_seq RESTART WITH 1;
+ALTER SEQUENCE productos_id_seq RESTART WITH 1;
+ALTER SEQUENCE proveedores_id_seq RESTART WITH 1;
+ALTER SEQUENCE clientes_id_seq RESTART WITH 1;
+ALTER SEQUENCE compras_id_seq RESTART WITH 1;
+ALTER SEQUENCE detalle_compras_id_seq RESTART WITH 1;
+ALTER SEQUENCE ventas_id_seq RESTART WITH 1;
+ALTER SEQUENCE detalle_ventas_id_seq RESTART WITH 1;
+ALTER SEQUENCE movimientos_inventario_id_seq RESTART WITH 1;
+ALTER SEQUENCE log_auditoria_id_seq RESTART WITH 1;
+
 -- ---------------------------------------------------------
 -- ÁREAS
 -- ---------------------------------------------------------
@@ -82,27 +95,27 @@ INSERT INTO proveedores (nombre, nit, email, telefono, direccion) VALUES
 -- ---------------------------------------------------------
 -- CLIENTES (20)
 -- ---------------------------------------------------------
-INSERT INTO clientes (nombre, nit, email, telefono) VALUES
-    ('Distribuciones La 10 S.A.S.', '900200101-1', 'compras@la10.com', '3102000001'),
-    ('Comercial El Progreso', '900200102-2', 'contacto@elprogreso.com', '3102000002'),
-    ('Oficinas Modernas S.A.S.', '900200103-3', 'admin@oficinasmodernas.com', '3102000003'),
-    ('Hotel Los Andes', '900200104-4', 'compras@hotellosandes.com', '3102000004'),
-    ('Restaurante El Buen Sabor', '900200105-5', 'admin@elbuensabor.com', '3102000005'),
-    ('Constructora Horizonte', '900200106-6', 'compras@horizonte.com', '3102000006'),
-    ('Colegio San Marcos', '900200107-7', 'compras@sanmarcos.edu', '3102000007'),
-    ('Clínica Central', '900200108-8', 'almacen@clinicacentral.com', '3102000008'),
-    ('Papelería La Estrella', '900200109-9', 'ventas@laestrella.com', '3102000009'),
-    ('Supermercado La Canasta', '900200110-0', 'compras@lacanasta.com', '3102000010'),
-    ('Empresa Soluciones TI', '900200111-1', 'admin@solucionesti.com', '3102000011'),
-    ('Almacenes del Valle', '900200112-2', 'compras@almacenesvalle.com', '3102000012'),
-    ('Universidad Regional', '900200113-3', 'compras@uregional.edu', '3102000013'),
-    ('Café Quetzal', '900200114-4', 'contacto@cafequetzal.com', '3102000014'),
-    ('Taller Mecánico El Rápido', '900200115-5', 'admin@elrapido.com', '3102000015'),
-    ('Ferretería Central', '900200116-6', 'compras@ferreteriacentral.com', '3102000016'),
-    ('Librería Nacional', '900200117-7', 'ventas@librerianacional.com', '3102000017'),
-    ('Agencia Creativa Uno', '900200118-8', 'admin@creativauno.com', '3102000018'),
-    ('Servicios Empresariales GT', '900200119-9', 'compras@servemp.com', '3102000019'),
-    ('Minimarket La Esquina', '900200120-0', 'contacto@minimarket.com', '3102000020');
+INSERT INTO clientes (nombre, tipo_documento, numero_documento, email, telefono) VALUES
+    ('Distribuciones La 10 S.A.S.', 'NIT', '900200101-1', 'compras@la10.com', '3102000001'),
+    ('Comercial El Progreso', 'NIT', '900200102-2', 'contacto@elprogreso.com', '3102000002'),
+    ('Oficinas Modernas S.A.S.', 'NIT', '900200103-3', 'admin@oficinasmodernas.com', '3102000003'),
+    ('Hotel Los Andes', 'NIT', '900200104-4', 'compras@hotellosandes.com', '3102000004'),
+    ('Restaurante El Buen Sabor', 'NIT', '900200105-5', 'admin@elbuensabor.com', '3102000005'),
+    ('Constructora Horizonte', 'NIT', '900200106-6', 'compras@horizonte.com', '3102000006'),
+    ('Colegio San Marcos', 'NIT', '900200107-7', 'compras@sanmarcos.edu', '3102000007'),
+    ('Clínica Central', 'NIT', '900200108-8', 'almacen@clinicacentral.com', '3102000008'),
+    ('Papelería La Estrella', 'NIT', '900200109-9', 'ventas@laestrella.com', '3102000009'),
+    ('Supermercado La Canasta', 'NIT', '900200110-0', 'compras@lacanasta.com', '3102000010'),
+    ('Empresa Soluciones TI', 'NIT', '900200111-1', 'admin@solucionesti.com', '3102000011'),
+    ('Almacenes del Valle', 'NIT', '900200112-2', 'compras@almacenesvalle.com', '3102000012'),
+    ('Universidad Regional', 'NIT', '900200113-3', 'compras@uregional.edu', '3102000013'),
+    ('Café Quetzal', 'NIT', '900200114-4', 'contacto@cafequetzal.com', '3102000014'),
+    ('Taller Mecánico El Rápido', 'NIT', '900200115-5', 'admin@elrapido.com', '3102000015'),
+    ('Ferretería Central', 'NIT', '900200116-6', 'compras@ferreteriacentral.com', '3102000016'),
+    ('Librería Nacional', 'NIT', '900200117-7', 'ventas@librerianacional.com', '3102000017'),
+    ('Agencia Creativa Uno', 'NIT', '900200118-8', 'admin@creativauno.com', '3102000018'),
+    ('Servicios Empresariales GT', 'NIT', '900200119-9', 'compras@servemp.com', '3102000019'),
+    ('Minimarket La Esquina', 'NIT', '900200120-0', 'contacto@minimarket.com', '3102000020');
 
 -- ---------------------------------------------------------
 -- COMPRAS (15)
@@ -313,4 +326,3 @@ UPDATE productos SET stock_actual = 32 WHERE id = 27;
 UPDATE productos SET stock_actual = 17 WHERE id = 28;
 UPDATE productos SET stock_actual = 36 WHERE id = 29;
 UPDATE productos SET stock_actual = 24 WHERE id = 30;
-
