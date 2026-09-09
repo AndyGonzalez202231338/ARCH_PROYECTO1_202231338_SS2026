@@ -20,4 +20,8 @@ public class LoginResponse {
      * Correo del usuario autenticado.
      */
     private String email;
+
+    private String rol;
+
+    private String token;
 }

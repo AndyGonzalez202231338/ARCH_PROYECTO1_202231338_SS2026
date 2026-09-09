@@ -1,0 +1,24 @@
+<main class="dashboard-page">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">Mini ERP / Panel principal</p>
+      <h1>Bienvenido, {{ user()?.email }}</h1>
+    </div>
+    <button type="button" (click)="logout()">Cerrar sesión</button>
+  </header>
+
+  <section class="status-panel">
+    <p class="eyebrow">Sesión activa</p>
+    <h2>Acceso confirmado</h2>
+    <p><strong>Área:</strong> {{ user()?.rol }}</p>
+    @if (loading) {
+      <p>Consultando el backend...</p>
+    }
+    @if (message) {
+      <p class="success-message">{{ message }}</p>
+    }
+    @if (errorMessage) {
+      <p class="error-message">{{ errorMessage }}</p>
+    }
+  </section>
+</main>

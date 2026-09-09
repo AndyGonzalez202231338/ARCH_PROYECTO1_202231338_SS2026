@@ -2,10 +2,12 @@ package com.minierp.backend.controller;
 
 import com.minierp.backend.dto.LoginRequest;
 import com.minierp.backend.dto.LoginResponse;
+import com.minierp.backend.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -24,6 +26,7 @@ public class AuthController {
      * todo el proceso de autenticación.
      */
     private final AuthenticationManager authenticationManager;
+        private final JwtService jwtService;
 
     /**
      * Endpoint de login.
@@ -67,9 +70,18 @@ public class AuthController {
          * Si llegamos hasta aquí,
          * las credenciales son correctas.
          */
+        String role = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_USER")
+                .replace("ROLE_", "");
+
         return new LoginResponse(
                 "Login exitoso",
-                authentication.getName()
+                authentication.getName(),
+                role,
+                jwtService.generateToken((org.springframework.security.core.userdetails.UserDetails)
+                        authentication.getPrincipal())
         );
     }
 }

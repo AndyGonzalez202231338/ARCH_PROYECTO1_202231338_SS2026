@@ -1,6 +1,5 @@
 package com.minierp.backend.config;
 
-import com.minierp.backend.service.UsuarioDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * Configuración principal de Spring Security.
@@ -18,12 +23,25 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UsuarioDetailsService usuarioDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:4200",
+                "http://127.0.0.1:4200"
+        ));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     /**
-     * Creamos el PasswordEncoder.
-     *
-     * BCrypt se encargará de convertir:
+     * Creamos el PasswordEncoder. BCrypt se encargará de convertir:
      *
      * Ese resultado es el que se almacena
      * en la columna password_hash.
@@ -38,9 +56,6 @@ public class SecurityConfig {
      * finalmente verifica:
      *
      * correo + contraseña
-     *
-     * contra:
-     *
      * usuario + hash BCrypt.
      */
     @Bean
@@ -66,10 +81,10 @@ public class SecurityConfig {
              * formularios HTML de Spring Security,
              * desactivamos CSRF por ahora.
              *
-             * Más adelante revisaremos esta decisión dependiendo
-             * de si utilizamos JWT o sesiones.
              */
             .csrf(csrf -> csrf.disable())
+
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
             /**
              * Permisos de las rutas.
@@ -80,13 +95,15 @@ public class SecurityConfig {
                  * El login debe poder utilizarse
                  * sin estar autenticado previamente.
                  */
-                .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/login", "/error").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                 /**
                  * Todo lo demás queda protegido.
                  */
                 .anyRequest().authenticated()
-            );
+            )
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
