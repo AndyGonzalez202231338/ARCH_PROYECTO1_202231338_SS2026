@@ -1,0 +1,30 @@
+<app-dashboard-header eyebrow="Panel principal / Compras"></app-dashboard-header>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  <app-stats-card title="Compras del período" value="Q 68,450.00" icon="shopping-cart" trend="up" trendValue="8%" subtitle="vs. período anterior"></app-stats-card>
+  <app-stats-card title="Total de proveedores" value="42" icon="truck" subtitle="proveedores activos"></app-stats-card>
+  <app-stats-card title="Productos adquiridos" value="1,240" icon="cube" subtitle="unidades este período"></app-stats-card>
+  <app-stats-card title="Compras recientes" value="18" icon="clipboard-document-list" subtitle="últimos 30 días"></app-stats-card>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+  <app-chart-card title="Compras realizadas por período" description="Monto total comprado" type="bar"
+                   [series]="comprasSeries" [periods]="['Semana', 'Mes', 'Año']"></app-chart-card>
+  <app-chart-card title="Top proveedores" description="Mayor monto de compras" type="bar" [series]="proveedoresSeries"></app-chart-card>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+  <div class="xl:col-span-2">
+    <app-data-table title="Últimas compras" [columns]="comprasColumns" [rows]="comprasRows"></app-data-table>
+  </div>
+
+  <div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm p-5">
+    <h3 class="text-sm font-semibold text-erp-primary mb-4">Productos más comprados</h3>
+    <div class="space-y-3">
+      <div *ngFor="let p of productosFrecuentes" class="flex items-center justify-between text-sm">
+        <span class="text-erp-primary/70">{{ p.nombre }}</span>
+        <span class="font-medium text-erp-primary">{{ p.cantidad }}</span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+  <div>
+    <p class="text-xs font-medium text-erp-secondary uppercase tracking-wide">{{ eyebrow }}</p>
+    <h1 class="text-2xl font-semibold text-erp-primary mt-1">Bienvenido, {{ user()?.email ?? 'Usuario' }}</h1>
+    <p class="text-sm text-erp-primary/50 mt-1">
+      Resumen general de las operaciones y actividad reciente del sistema.
+    </p>
+  </div>
+
+  <div class="flex items-center gap-2 shrink-0">
+    <button type="button" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                  border border-erp-border bg-erp-card text-erp-primary hover:bg-erp-bg">
+      <app-icon name="calendar-days" class="w-4 h-4 text-erp-primary/50"></app-icon>
+      Últimos 30 días
+    </button>
+    <button type="button" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm
+                                  bg-erp-secondary text-white hover:bg-erp-secondary/90">
+      <app-icon name="arrow-path" class="w-4 h-4"></app-icon>
+      Actualizar
+    </button>
+  </div>
+</div>

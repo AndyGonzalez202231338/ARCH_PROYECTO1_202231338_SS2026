@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -14,26 +15,26 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+
   email = '';
   password = '';
-  loading = false;
-  errorMessage = '';
+
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
 
   submit(): void {
-    this.errorMessage = '';
-    this.loading = true;
+    this.errorMessage.set('');
+    this.loading.set(true);
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: () => {
-        this.loading = false;
+        this.loading.set(false);
         void this.router.navigateByUrl('/dashboard');
       },
-      error: (error: { status?: number }) => {
-        this.loading = false;
-        this.errorMessage = error.status === 401
-          ? 'El correo o la contraseña no son correctos.'
-          : 'No fue posible conectar con el servidor.';
-      }
+      error: (err: HttpErrorResponse) => {
+        this.loading.set(false);
+        this.errorMessage.set(err.error?.message ?? 'No fue posible iniciar sesión. Intenta de nuevo.');
+      },
     });
   }
 }

@@ -16,6 +16,10 @@ export type IconName =
   imports: [CommonModule],
   templateUrl: './icon.html',
   styleUrl: './icon.scss',
+  host: {
+    '[class]': 'class',
+    'class': 'inline-flex items-center justify-center shrink-0',
+  },
 })
 export class Icon {
   @Input({ required: true }) name!: IconName;

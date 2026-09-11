@@ -1,0 +1,40 @@
+<app-dashboard-header eyebrow="Panel principal / Administración"></app-dashboard-header>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  <app-stats-card title="Ventas totales" value="Q 125,000.00" icon="chart-bar" trend="up" trendValue="12%" subtitle="vs. período anterior"></app-stats-card>
+  <app-stats-card title="Compras totales" value="Q 68,450.00" icon="shopping-cart" trend="down" trendValue="4%" subtitle="vs. período anterior"></app-stats-card>
+  <app-stats-card title="Productos registrados" value="312" icon="cube" subtitle="en catálogo activo"></app-stats-card>
+  <app-stats-card title="Clientes registrados" value="184" icon="users" trend="up" trendValue="6%" subtitle="vs. período anterior"></app-stats-card>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+  <div class="xl:col-span-2">
+    <app-chart-card title="Ventas vs Compras" description="Comparativo mensual" type="line"
+                     [series]="ventasComprasSeries" [periods]="['Mes', 'Trimestre', 'Año']"></app-chart-card>
+  </div>
+
+  <div class="bg-erp-card border border-erp-border rounded-erp shadow-erp-sm p-5">
+    <h3 class="text-sm font-semibold text-erp-primary mb-4">Resumen de inventario</h3>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-erp-primary/70"><span class="w-2 h-2 rounded-full bg-erp-secondary"></span> Disponibles</div>
+        <span class="text-sm font-semibold text-erp-primary">268</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-erp-primary/70"><span class="w-2 h-2 rounded-full bg-erp-warning"></span> Existencia baja</div>
+        <span class="text-sm font-semibold text-erp-primary">31</span>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 text-sm text-erp-primary/70"><span class="w-2 h-2 rounded-full bg-erp-critical"></span> Sin existencias</div>
+        <span class="text-sm font-semibold text-erp-primary">13</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+  <div class="xl:col-span-2">
+    <app-data-table title="Últimas ventas" [columns]="ventasColumns" [rows]="ventasRows"></app-data-table>
+  </div>
+  <app-alert-card [alerts]="alerts"></app-alert-card>
+</div>
