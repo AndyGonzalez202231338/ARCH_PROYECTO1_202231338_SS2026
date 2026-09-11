@@ -1,24 +1,67 @@
-<main class="dashboard-page">
-  <header class="dashboard-header">
+<main class="min-h-[100dvh] bg-[#f3f1e9] text-[#18352c] px-4 py-8 sm:px-[5vw] lg:px-20 font-sans">
+  
+  <!-- Header -->
+  <header class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-[#cbd8ce]">
     <div>
-      <p class="eyebrow">Mini ERP / Panel principal</p>
-      <h1>Bienvenido, {{ user()?.email }}</h1>
+      <p class="text-[#1d6b55] text-xs font-bold tracking-[0.12em] uppercase mb-3">
+        Mini ERP / Panel principal
+      </p>
+      <h1 class="text-3xl sm:text-4xl md:text-[clamp(2rem,5vw,4rem)] font-extrabold text-[#18352c] leading-tight tracking-tight">
+        Bienvenido, <br class="hidden lg:hidden sm:block" />
+        <span class="text-[#1d6b55]">{{ user()?.email }}</span>
+      </h1>
     </div>
-    <button type="button" (click)="logout()">Cerrar sesión</button>
+    
+    <button 
+      type="button" 
+      (click)="logout()"
+      class="px-6 py-3 sm:py-2.5 border-2 border-[#1d6b55] text-[#1d6b55] font-bold rounded-lg hover:bg-[#1d6b55] hover:text-[#fffdf8] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#1d6b55]/30 shadow-sm hover:shadow"
+    >
+      Cerrar sesión
+    </button>
   </header>
 
-  <section class="status-panel">
-    <p class="eyebrow">Sesión activa</p>
-    <h2>Acceso confirmado</h2>
-    <p><strong>Área:</strong> {{ user()?.rol }}</p>
-    @if (loading) {
-      <p>Consultando el backend...</p>
-    }
-    @if (message) {
-      <p class="success-message">{{ message }}</p>
-    }
-    @if (errorMessage) {
-      <p class="error-message">{{ errorMessage }}</p>
-    }
+  <!-- Status Panel -->
+  <section class="w-full max-w-2xl mt-10 p-6 sm:p-8 bg-[#fffdf8] border-l-[6px] border-[#1d6b55] rounded-xl shadow-md">
+    
+    <div class="mb-6">
+      <p class="text-[#1d6b55] text-xs font-bold tracking-widest uppercase mb-2">Sesión activa</p>
+      <h2 class="text-2xl font-bold text-[#18352c]">Acceso confirmado</h2>
+    </div>
+
+    <!-- User Role Badge -->
+    <div class="flex items-center gap-3 p-4 bg-[#f3f1e9]/50 rounded-lg border border-[#cbd8ce]/50 mb-2">
+      <svg class="w-5 h-5 text-[#1d6b55]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+      <p class="text-[1.1rem]">
+        <strong class="text-[#18352c] font-semibold">Área asignada:</strong>
+        <span class="ml-1 text-[#1d6b55] font-medium">{{ user()?.rol }}</span>
+      </p>
+    </div>
+
+    <!-- Status Messages -->
+    <div class="flex flex-col gap-3 mt-4">
+      
+      @if (loading) {
+        <div class="flex items-center gap-3 p-4 text-[#18352c]/70 bg-white rounded-lg border border-[#cbd8ce] shadow-sm animate-pulse">
+          <svg class="w-5 h-5 animate-spin text-[#1d6b55]" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <p class="font-medium text-sm">Consultando el backend...</p>
+        </div>
+      }
+
+      @if (message) {
+        <div class="flex items-center gap-3 p-4 bg-[#1d6b55]/10 border border-[#1d6b55]/30 text-[#1d6b55] rounded-lg shadow-sm">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <p class="font-medium text-sm">{{ message }}</p>
+        </div>
+      }
+
+      @if (errorMessage) {
+        <div class="flex items-center gap-3 p-4 bg-[#a33b35]/10 border border-[#a33b35]/30 text-[#a33b35] rounded-lg shadow-sm">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <p class="font-medium text-sm">{{ errorMessage }}</p>
+        </div>
+      }
+      
+    </div>
   </section>
 </main>

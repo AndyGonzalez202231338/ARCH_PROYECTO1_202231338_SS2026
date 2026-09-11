@@ -2,9 +2,11 @@ import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Icon } from '../../shared/icon/icon';
 import { AuthService } from '../../core/services/auth.service';
+import { NgClass, NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   imports: [Icon],
   templateUrl: './header.html',
   styleUrl: './header.scss',

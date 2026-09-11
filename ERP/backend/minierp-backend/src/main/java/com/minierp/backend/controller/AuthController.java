@@ -3,6 +3,7 @@ package com.minierp.backend.controller;
 import com.minierp.backend.dto.LoginRequest;
 import com.minierp.backend.dto.LoginResponse;
 import com.minierp.backend.service.JwtService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +27,7 @@ public class AuthController {
      * todo el proceso de autenticación.
      */
     private final AuthenticationManager authenticationManager;
-        private final JwtService jwtService;
+    private final JwtService jwtService;
 
     /**
      * Endpoint de login.
@@ -35,7 +36,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public LoginResponse login(
-            @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
 
         /**

@@ -1,0 +1,23 @@
+<app-dashboard-header eyebrow="Panel principal / Inventario"></app-dashboard-header>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+  <app-stats-card title="Productos en inventario" value="312" icon="cube"></app-stats-card>
+  <app-stats-card title="Existencias disponibles" value="4,820 u." icon="archive-box"></app-stats-card>
+  <app-stats-card title="Existencia baja" value="31" icon="exclamation-triangle" subtitle="requieren atención"></app-stats-card>
+  <app-stats-card title="Movimientos recientes" value="57" icon="arrow-path" subtitle="últimos 7 días"></app-stats-card>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+  <div class="xl:col-span-2">
+    <app-chart-card title="Movimientos de inventario" description="Entradas vs salidas" type="bar"
+                     [series]="movimientosSeries" [periods]="['Semana', 'Mes']"></app-chart-card>
+  </div>
+  <app-alert-card title="Alertas de inventario" [alerts]="alerts"></app-alert-card>
+</div>
+
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-4">
+  <div class="xl:col-span-2">
+    <app-data-table title="Productos con menor existencia" [columns]="columns" [rows]="rows"></app-data-table>
+  </div>
+  <app-recent-activity [items]="actividad"></app-recent-activity>
+</div>

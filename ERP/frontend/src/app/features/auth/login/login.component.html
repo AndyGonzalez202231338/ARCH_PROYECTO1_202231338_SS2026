@@ -28,12 +28,12 @@
         autocomplete="current-password"
       />
 
-      @if (errorMessage) {
-        <p class="error-message" role="alert">{{ errorMessage }}</p>
+      @if (errorMessage()) {
+        <p class="error-message" role="alert">{{ errorMessage() }}</p>
       }
 
-      <button type="submit" [disabled]="loginForm.invalid || loading">
-        {{ loading ? 'Validando...' : 'Iniciar sesión' }}
+      <button type="submit" [disabled]="loginForm.invalid || loading()">
+        {{ loading() ? 'Validando...' : 'Iniciar sesión' }}
       </button>
     </form>
   </section>

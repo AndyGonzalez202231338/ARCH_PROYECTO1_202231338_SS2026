@@ -1,49 +1,92 @@
-<header class="h-16 shrink-0 bg-erp-card border-b border-erp-border shadow-erp-sm
-               flex items-center justify-between px-4 md:px-6 relative z-20">
-  <div class="flex items-center gap-3">
+<header class="h-[72px] shrink-0 bg-erp-card border-b border-erp-border shadow-sm flex items-center justify-between px-4 sm:px-6 lg:px-8 relative z-20 transition-all">
+  
+  <!-- Left: Toggle Sidebar & Logo -->
+  <div class="flex items-center gap-3 sm:gap-4">
+    <!-- Botón Hamburguesa -->
     <button type="button" (click)="toggleSidebar.emit()"
-            class="lg:hidden w-9 h-9 flex items-center justify-center rounded-lg text-erp-primary hover:bg-erp-bg">
+            class="lg:hidden relative p-2 -ml-2 flex items-center justify-center rounded-lg text-erp-primary hover:bg-erp-bg hover:text-erp-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-erp-secondary/50">
       <app-icon name="bars-3" class="w-5 h-5"></app-icon>
     </button>
-    <div class="flex items-center gap-2.5">
-      <div class="w-9 h-9 rounded-lg bg-erp-primary flex items-center justify-center">
-        <app-icon name="cube" class="w-5 h-5 text-erp-bg"></app-icon>
+
+    <!-- Logo y Título -->
+    <div class="flex items-center gap-3 cursor-pointer group">
+      <div class="w-10 h-10 rounded-xl bg-erp-primary flex items-center justify-center shadow-inner group-hover:bg-erp-secondary transition-colors duration-300">
+        <app-icon name="cube" class="w-5 h-5 text-erp-card"></app-icon>
       </div>
-      <div class="hidden sm:block leading-tight">
-        <p class="text-sm font-semibold text-erp-primary">Mini ERP</p>
-        <p class="text-[11px] text-erp-primary/50">Gestión Comercial</p>
+      <div class="hidden sm:flex flex-col justify-center">
+        <h2 class="text-[15px] font-extrabold text-erp-primary leading-tight tracking-tight">Mini ERP</h2>
+        <p class="text-[10px] font-bold text-erp-primary/60 uppercase tracking-widest mt-0.5">Gestión Comercial</p>
       </div>
     </div>
   </div>
 
-  <div class="flex items-center gap-2 md:gap-4">
-    <button type="button" class="relative w-9 h-9 flex items-center justify-center rounded-lg text-erp-primary hover:bg-erp-bg">
-      <app-icon name="bell" class="w-5 h-5"></app-icon>
-      <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-erp-critical"></span>
+  <!-- Right: Notificaciones & Usuario -->
+  <div class="flex items-center gap-1 sm:gap-4">
+    
+    <!-- Botón Notificaciones -->
+    <button type="button" 
+            class="relative p-2 rounded-lg text-erp-primary hover:bg-erp-bg hover:text-erp-secondary transition-colors focus:outline-none focus:ring-2 focus:ring-erp-secondary/50">
+      <app-icon name="bell" class="w-[22px] h-[22px]"></app-icon>
+      <!-- Indicador animado (Ping) -->
+      <span class="absolute top-1.5 right-2 flex h-2.5 w-2.5">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-erp-critical opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-erp-critical border-2 border-erp-card"></span>
+      </span>
     </button>
 
+    <!-- Separador Vertical -->
+    <div class="hidden sm:block w-px h-8 bg-erp-border mx-1"></div>
+
+    <!-- Menú de Usuario -->
     <div class="relative">
       <button type="button" (click)="userMenuOpen = !userMenuOpen"
-              class="flex items-center gap-2.5 pl-1 pr-2 py-1 rounded-lg hover:bg-erp-bg">
-        <div class="w-8 h-8 rounded-full bg-erp-secondary text-white flex items-center justify-center text-xs font-semibold">
+              class="flex items-center gap-3 p-1.5 sm:pr-3 rounded-xl hover:bg-erp-bg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-erp-secondary/50"
+              [class.bg-erp-bg]="userMenuOpen">
+        
+        <div class="w-9 h-9 rounded-full bg-erp-secondary text-erp-card flex items-center justify-center text-sm font-bold shadow-sm">
           {{ initials }}
         </div>
-        <div class="hidden md:block text-left leading-tight">
-          <p class="text-sm font-medium text-erp-primary">{{ email }}</p>
-          <p class="text-[11px] text-erp-secondary">{{ role }}</p>
+        
+        <div class="hidden md:flex flex-col items-start leading-none">
+          <span class="text-[13px] font-bold text-erp-primary">{{ email }}</span>
+          <span class="text-[11px] font-medium text-erp-secondary mt-1">{{ role }}</span>
         </div>
-        <app-icon name="chevron-down" class="w-4 h-4 text-erp-primary/40 hidden md:block"></app-icon>
+        
+        <!-- Flecha con animación de rotación -->
+        <app-icon name="chevron-down" 
+                  class="w-4 h-4 text-erp-primary/50 hidden md:block transition-transform duration-300"
+                  [class.rotate-180]="userMenuOpen"></app-icon>
       </button>
 
-      <div *ngIf="userMenuOpen"
-           class="absolute right-0 mt-2 w-48 bg-erp-card border border-erp-border rounded-erp shadow-erp-md py-1.5 z-30">
-        <a class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-primary hover:bg-erp-bg cursor-pointer">Mi perfil</a>
-        <a class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-primary hover:bg-erp-bg cursor-pointer">Configuración</a>
-        <div class="my-1 border-t border-erp-border"></div>
-        <a (click)="logout()" class="flex items-center gap-2.5 px-4 py-2 text-sm text-erp-critical hover:bg-erp-critical/5 cursor-pointer">
-          Cerrar sesión
-        </a>
-      </div>
+      <!-- Dropdown Menu -->
+      @if (userMenuOpen) {
+        <div class="absolute right-0 mt-3 w-56 bg-erp-card border border-erp-border rounded-xl shadow-lg py-2 z-30 origin-top-right transition-all transform opacity-100 scale-100">
+          
+          <div class="md:hidden px-4 py-3 mb-1 border-b border-erp-border">
+            <p class="text-sm font-bold text-erp-primary truncate">{{ email }}</p>
+            <p class="text-xs font-medium text-erp-secondary mt-0.5">{{ role }}</p>
+          </div>
+
+          <!-- AQUÍ ESTÁ LA CORRECCIÓN: name="users" -->
+          <a class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-erp-primary hover:bg-erp-bg hover:text-erp-secondary transition-colors cursor-pointer">
+            <app-icon name="users" class="w-4 h-4 text-erp-primary/50"></app-icon>
+            Mi perfil
+          </a>
+          
+          <!-- AQUÍ ESTÁ LA CORRECCIÓN: name="cog-6-tooth" -->
+          <a class="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-erp-primary hover:bg-erp-bg hover:text-erp-secondary transition-colors cursor-pointer">
+            <app-icon name="cog-6-tooth" class="w-4 h-4 text-erp-primary/50"></app-icon>
+            Configuración
+          </a>
+          
+          <div class="my-1.5 border-t border-erp-border"></div>
+          
+          <a (click)="logout()" class="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-erp-critical hover:bg-erp-critical/10 transition-colors cursor-pointer">
+            <app-icon name="arrow-right-on-rectangle" class="w-4 h-4 text-erp-critical/70"></app-icon>
+            Cerrar sesión
+          </a>
+        </div>
+      }
     </div>
   </div>
 </header>
