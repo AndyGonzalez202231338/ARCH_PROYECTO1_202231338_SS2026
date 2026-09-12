@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { UsuarioService } from '../../core/services/usuario.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -10,20 +11,25 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  private readonly http = inject(HttpClient);
+  private readonly usuarioService = inject(UsuarioService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
   readonly user = this.auth.currentUser;
-  message = '';
-  loading = true;
-  errorMessage = '';
+
+  readonly message = signal('');
+  readonly loading = signal(true);
+  readonly errorMessage = signal('');
 
   ngOnInit(): void {
-    this.http.get<string>('http://localhost:8080/api/usuarios/me').subscribe({
-      next: (response) => { this.message = response; this.loading = false; },
-      error: () => {
-        this.loading = false;
-        this.errorMessage = 'No fue posible cargar el usuario autenticado.';
+    this.usuarioService.getMe().subscribe({
+      next: (response) => {
+        this.message.set(`Sesión verificada correctamente para ${response.nombre}.`);
+        this.loading.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.loading.set(false);
+        this.errorMessage.set(err.error?.message ?? 'No fue posible cargar el usuario autenticado.');
       }
     });
   }

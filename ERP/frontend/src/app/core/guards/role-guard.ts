@@ -1,6 +1,8 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { AuthService } from '../services/auth.service';
+import { PermissionsService } from '../permissions/permissions.service';
+import { PermissionKey } from '../permissions/permission.model';
 
 /**
  * Protege una ruta hija según el rol del usuario autenticado.
@@ -8,14 +10,13 @@ import { AuthService } from '../services/auth.service';
  * roleGuard exige que el rol esté en route.data['roles'].
  */
 export const roleGuard: CanActivateFn = (route) => {
-  const auth = inject(AuthService);
+  const permissions = inject(PermissionsService);
   const router = inject(Router);
 
-  const allowedRoles = route.data['roles'] as string[] | undefined;
-  const userRole = auth.getRole();
+  const key = route.data['permission'] as PermissionKey | undefined;
 
-  if (!allowedRoles || allowedRoles.length === 0) return true;
-  if (userRole && allowedRoles.includes(userRole)) return true;
+  // Si la ruta no declara `permission`, se asume visible para cualquier autenticado
+  if (!key) return true;
 
-  return router.createUrlTree(['/dashboard']);
+  return permissions.hasAccess(key) ? true : router.createUrlTree(['/dashboard']);
 };

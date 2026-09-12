@@ -9,14 +9,8 @@ interface MenuItem {
   path: string;
 }
 
-/**
- * Menú por rol. Las claves deben coincidir EXACTO con el string que
- * devuelve AuthService.getRole() (el campo `rol` que manda tu backend
- * en LoginResponse). Ajusta los strings si tu backend usa otro formato
- * (ej. "ROLE_ADMIN" en vez de "ADMIN").
- */
 const MENU_BY_ROLE: Record<string, MenuItem[]> = {
-  ADMIN: [
+  ADMINISTRACION: [
     { label: 'Dashboard', icon: 'home', path: '/dashboard' },
     { label: 'Productos', icon: 'cube', path: '/productos' },
     { label: 'Proveedores', icon: 'truck', path: '/proveedores' },
@@ -59,7 +53,7 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
   styleUrl: './sidebar.scss',
 })
 export class Sidebar {
-  @Input() role = 'ADMIN';
+  @Input() role = 'ADMINISTRACION';
   @Input() open = false;
   @Output() closeMenu = new EventEmitter<void>();
 
