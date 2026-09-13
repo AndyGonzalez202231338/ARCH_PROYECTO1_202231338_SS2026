@@ -6,6 +6,7 @@ import com.minierp.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +21,13 @@ public class UsuarioController {
     private final UsuarioRepository usuarioRepository;
 
     @GetMapping("/me")
-    public UsuarioMeResponse me(@AuthenticationPrincipal UserDetails principal) {
-
-        Usuario usuario = usuarioRepository.findByEmail(principal.getUsername())
+    public UsuarioMeResponse me() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmailWithArea(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        String rol = principal.getAuthorities().stream()
+        String rol = SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
                 .orElse("ROLE_USER")
