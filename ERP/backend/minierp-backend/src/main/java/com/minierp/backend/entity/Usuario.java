@@ -1,74 +1,81 @@
 package com.minierp.backend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
 /**
- * Esta clase representa la tabla "usuarios" de PostgreSQL.
+ * Representa la tabla "usuarios" de PostgreSQL.
  *
  * La entidad NO contiene la lógica de login.
- * Su responsabilidad principal es representar los datos
- * almacenados en la base de datos.
+ * Solo representa los datos almacenados en la base de datos.
  */
 @Entity
-@Table(name = "usuarios")
+@Table(
+    name = "usuarios",
+    uniqueConstraints = @UniqueConstraint(name = "uk_usuarios_email", columnNames = "email")
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Usuario {
-    /**
-     * ID del usuario.
-     *
-     * En PostgreSQL corresponde a:
-     * id BIGSERIAL PRIMARY KEY
-     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Nombre completo del usuario.
-     */
-    @Column(nullable = false, length = 100)
+    @NotBlank
+    @Size(max = 120)
+    @Column(nullable = false, length = 120)
     private String nombre;
 
-    /**
-     * Correo utilizado para iniciar sesión.
-     *
-     * En la base de datos es UNIQUE.
-     */
+    @NotBlank
+    @Email
+    @Size(max = 150)
     @Column(nullable = false, unique = true, length = 150)
     private String email;
 
     /**
-     * Guardamos únicamente el hash generado con BCrypt.
+     * Hash de la contraseña generado con BCrypt.
+     * Nunca se expone al cliente.
      */
+    @NotBlank
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
     /**
-     * ID del área a la que pertenece el usuario.
-     *
-     * Por ahora lo manejamos como Long para mantener
-     * sencillo el módulo de autenticación.
-     *
-     * Posteriormente podemos relacionarlo con Area.java
-     * mediante @ManyToOne.
+     * Área/rol del usuario.
+     * Relación N:1 con Area. FK: area_id.
      */
-    @Column(name = "area_id", nullable = false)
-    private Long areaId;
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+        name = "area_id",
+        nullable = false,
+        foreignKey = @ForeignKey(name = "fk_usuarios_area")
+    )
+    private Area area;
 
-    /**
-     * Indica si el usuario puede utilizar el sistema.
-     */
+    @NotNull
     @Column(nullable = false)
-    private Boolean activo;
+    @Builder.Default
+    private Boolean activo = true;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Usuario)) return false;
+        Usuario that = (Usuario) o;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
