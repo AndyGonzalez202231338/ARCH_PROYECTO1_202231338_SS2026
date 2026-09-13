@@ -1,6 +1,6 @@
 package com.minierp.backend.controller;
 
-import com.minierp.backend.dto.UsuarioMeResponse;
+import com.minierp.backend.dto.auth.UsuarioMeResponse;
 import com.minierp.backend.entity.Usuario;
 import com.minierp.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;

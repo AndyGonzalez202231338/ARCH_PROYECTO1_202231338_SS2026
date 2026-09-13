@@ -1,4 +1,4 @@
-package com.minierp.backend.dto;
+package com.minierp.backend.dto.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

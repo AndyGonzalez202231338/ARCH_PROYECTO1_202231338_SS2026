@@ -1,4 +1,4 @@
-package com.minierp.backend.dto;
+package com.minierp.backend.dto.common;
 
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package com.minierp.backend.controller;
 
-import com.minierp.backend.dto.LoginRequest;
-import com.minierp.backend.dto.LoginResponse;
+import com.minierp.backend.dto.auth.LoginRequest;
+import com.minierp.backend.dto.auth.LoginResponse;
 import com.minierp.backend.service.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
