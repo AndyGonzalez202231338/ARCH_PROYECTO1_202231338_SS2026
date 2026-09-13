@@ -46,4 +46,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
            "WHERE p.activo = true " +
            "ORDER BY p.stockActual ASC")
     List<Producto> findMenorExistencia(org.springframework.data.domain.Pageable pageable);
+
+    /**
+     * Verifica si existen productos asociados a una categoría.
+     * Para la regla de negocio: no eliminar categoría con productos.
+     */
+    @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END "+
+           "FROM Producto p WHERE p.categoria.id = :categoriaId")
+    boolean existsByCategoriaId(@Param("categoriaId") Long categoriaId);
 }
