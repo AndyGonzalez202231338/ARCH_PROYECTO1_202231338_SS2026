@@ -1,0 +1,133 @@
+<app-toast></app-toast>
+
+<div class="flex flex-col gap-6 font-sans">
+  
+  <!-- Header del Formulario -->
+  <div class="flex flex-col">
+    <!-- Breadcrumb -->
+    <nav class="text-[13px] text-erp-primary/60 font-medium mb-3 flex items-center gap-2">
+      <span>Inicio</span>
+      <span>/</span>
+      <a routerLink="/usuarios" class="hover:text-erp-secondary transition-colors cursor-pointer">Usuarios</a>
+      <span>/</span>
+      <span class="text-erp-primary font-bold">{{ breadcrumbActual() }}</span>
+    </nav>
+
+    <!-- Botón Volver -->
+    <button type="button" class="self-start text-[13px] font-bold text-erp-secondary hover:text-erp-primary hover:underline transition-all flex items-center gap-1 mb-2" (click)="cancelar()">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      Volver
+    </button>
+
+    <h1 class="text-2xl md:text-3xl font-extrabold text-erp-primary tracking-tight">
+      {{ titulo() }}
+    </h1>
+  </div>
+
+  <!-- Formulario -->
+  <div class="bg-erp-card border border-erp-border rounded-xl shadow-sm max-w-2xl w-full mx-auto p-6 md:p-8" *ngIf="!cargandoDatos()">
+    
+    <h2 class="text-lg font-extrabold text-erp-primary mb-6 border-b border-erp-border/50 pb-4">
+      Información del Usuario
+    </h2>
+
+    <form [formGroup]="form" class="flex flex-col gap-5" (ngSubmit)="guardar()">
+      
+      <!-- Nombre Completo -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Nombre completo <span class="text-erp-critical">*</span>
+        </label>
+        <input type="text" formControlName="nombre" maxlength="120" placeholder="Ej. Ana Morales" 
+               class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+        <p *ngIf="campoInvalido('nombre')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          El nombre es requerido (máximo 120 caracteres).
+        </p>
+      </div>
+
+      <!-- Correo Electrónico -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Correo electrónico <span class="text-erp-critical">*</span>
+        </label>
+        <input type="email" formControlName="email" placeholder="usuario@minierp.com" 
+               class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+        <p *ngIf="campoInvalido('email')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          Ingresa un correo electrónico válido.
+        </p>
+      </div>
+
+      <!-- Contraseña (Creación) -->
+      <div class="flex flex-col gap-1.5" *ngIf="!modoEdicion">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Contraseña <span class="text-erp-critical">*</span>
+        </label>
+        <input type="password" formControlName="password" placeholder="Mínimo 6 caracteres" 
+               class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+        <p *ngIf="campoInvalido('password')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          La contraseña debe tener al menos 6 caracteres.
+        </p>
+      </div>
+
+      <!-- Contraseña (Edición) -->
+      <div class="flex flex-col gap-1.5 p-4 bg-erp-bg/50 rounded-lg border border-erp-border/50" *ngIf="modoEdicion">
+        <label class="text-[13px] font-bold text-erp-primary flex items-center gap-2">
+          <svg class="w-4 h-4 text-erp-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Contraseña
+        </label>
+        <p class="text-[13px] text-erp-primary/60 font-medium">La contraseña de este usuario se gestiona desde el listado principal usando el botón de la llave.</p>
+      </div>
+
+      <!-- Área -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Área <span class="text-erp-critical">*</span>
+        </label>
+        <select formControlName="areaId" 
+                class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all cursor-pointer">
+          <option [ngValue]="null" disabled>Selecciona un área asignada</option>
+          <option *ngFor="let area of areas()" [ngValue]="area.id">{{ area.nombre }}</option>
+        </select>
+        <p *ngIf="campoInvalido('areaId')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          Selecciona un área válida.
+        </p>
+      </div>
+
+      <!-- Switch Activo/Inactivo -->
+      <div class="flex items-center gap-3 mt-2">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" formControlName="activo" class="sr-only peer" />
+          <div class="w-11 h-6 bg-erp-border/80 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-erp-secondary focus:ring-2 focus:ring-erp-secondary/30"></div>
+        </label>
+        <span class="text-[14px] font-bold text-erp-primary">Usuario activo en el sistema</span>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex flex-col sm:flex-row items-center justify-end gap-3 mt-6 pt-6 border-t border-erp-border/50">
+        <button type="button" class="w-full sm:w-auto px-6 py-2.5 bg-erp-card border border-erp-border text-erp-primary font-bold rounded-lg hover:bg-erp-bg transition-colors" (click)="cancelar()">
+          Cancelar
+        </button>
+        <button type="submit" 
+                class="w-full sm:w-auto px-6 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm focus:outline-none focus:ring-4 focus:ring-erp-secondary/30" 
+                [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando cambios...' : textoBoton() }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Skeleton Loading (Cargando datos) -->
+  <div class="bg-erp-card border border-erp-border rounded-xl shadow-sm max-w-2xl w-full mx-auto p-6 md:p-8 animate-pulse" *ngIf="cargandoDatos()">
+    <div class="h-6 bg-erp-border/60 rounded w-1/3 mb-8"></div>
+    <div class="flex flex-col gap-6">
+      <div class="h-12 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-12 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-12 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-12 bg-erp-border/40 rounded-lg w-1/2"></div>
+      <div class="flex justify-end gap-3 mt-4">
+        <div class="h-10 bg-erp-border/50 rounded-lg w-24"></div>
+        <div class="h-10 bg-erp-border/60 rounded-lg w-32"></div>
+      </div>
+    </div>
+  </div>
+</div>

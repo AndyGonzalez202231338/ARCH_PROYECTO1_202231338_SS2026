@@ -1,0 +1,17 @@
+<div *ngIf="open" class="confirm-overlay" (click)="onOverlayClick()">
+  <div class="confirm-card" [class]="'confirm-card--' + variante" (click)="$event.stopPropagation()">
+    <div class="confirm-card__icon">
+      {{ variante === 'success' ? '✓' : '⚠️' }}
+    </div>
+    <h3 class="confirm-card__title">{{ titulo }}</h3>
+    <p class="confirm-card__message">{{ mensaje }}</p>
+    <div class="confirm-card__actions">
+      <button type="button" class="btn btn--secondary" (click)="cancelar.emit()">
+        {{ textoCancelar }}
+      </button>
+      <button type="button" class="btn btn--confirm" [class]="'btn--confirm-' + variante" (click)="confirmar.emit()">
+        {{ textoConfirmar }}
+      </button>
+    </div>
+  </div>
+</div>

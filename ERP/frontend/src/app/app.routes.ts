@@ -25,7 +25,29 @@ export const routes: Routes = [
         path: 'usuarios',
         canActivate: [roleGuard],
         data: { permission: 'usuarios', title: 'Usuarios' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/administracion/usuarios/pages/usuarios-lista/usuarios-lista').then(
+                m => m.UsuariosLista,
+              ),
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () =>
+              import('./features/administracion/usuarios/pages/usuario-form/usuario-form').then(
+                m => m.UsuarioForm,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/administracion/usuarios/pages/usuario-form/usuario-form').then(
+                m => m.UsuarioForm,
+              ),
+          },
+        ],
       },
 
       // --- Productos: ADMIN + INVENTARIO (full), COMPRAS + VENTAS (solo lectura) ---
