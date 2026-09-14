@@ -92,7 +92,36 @@ export const routes: Routes = [
         path: 'proveedores',
         canActivate: [roleGuard],
         data: { permission: 'proveedores', title: 'Proveedores' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/proveedores/pages/proveedor-lista/proveedor-lista').then(
+                m => m.ProveedorLista,
+              ),
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () =>
+              import('./features/proveedores/pages/proveedor-form/proveedor-form').then(
+                m => m.ProveedorForm,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/proveedores/pages/proveedor-detalle/proveedor-detalle').then(
+                m => m.ProveedorDetalle,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/proveedores/pages/proveedor-form/proveedor-form').then(
+                m => m.ProveedorForm,
+              ),
+          },
+        ],
       },
 
       // --- Clientes: ADMIN + VENTAS ---

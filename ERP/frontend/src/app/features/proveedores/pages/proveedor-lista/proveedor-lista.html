@@ -1,0 +1,186 @@
+<app-toast></app-toast>
+
+<div class="flex flex-col gap-6 font-sans">
+  <!-- Encabezado -->
+  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+    <div>
+      <nav class="text-[13px] text-erp-primary/60 font-medium mb-2 flex items-center gap-2">
+        <span>Inicio</span>
+        <span>/</span>
+        <span class="text-erp-primary font-bold">Proveedores</span>
+      </nav>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-erp-primary tracking-tight">Gestión de Proveedores</h1>
+      <p class="text-sm text-erp-primary/60 mt-1">
+        {{ puedeEditar() ? 'Administra los proveedores del sistema' : 'Consulta los proveedores del sistema' }}
+      </p>
+    </div>
+
+    <button *ngIf="puedeEditar()" type="button"
+            class="px-5 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary transition-all duration-300 shadow-sm hover:shadow focus:outline-none focus:ring-4 focus:ring-erp-secondary/30 shrink-0"
+            (click)="nuevoProveedor()">
+      + Nuevo Proveedor
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="flex flex-wrap items-center gap-3 bg-erp-card border border-erp-border rounded-xl p-3 shadow-sm">
+    <div class="relative flex-1 min-w-[240px]">
+      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-erp-primary/50">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+      </span>
+      <input
+        type="text"
+        placeholder="Buscar por nombre o NIT..."
+        [value]="searchDisplay()"
+        (input)="onBuscarInput($any($event.target).value)"
+        class="w-full bg-erp-bg/50 border border-erp-border rounded-lg pl-9 pr-3 py-2 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all" />
+    </div>
+
+    <select [value]="estadoFilter()" (change)="onEstadoChange($any($event.target).value)"
+            class="bg-erp-bg/50 border border-erp-border rounded-lg px-3 py-2 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all cursor-pointer">
+      <option value="todos">Todos los estados</option>
+      <option value="activos">Activos</option>
+      <option value="inactivos">Inactivos</option>
+    </select>
+
+    <button *ngIf="hasFiltros()" type="button"
+            class="px-4 py-2 text-sm font-semibold text-erp-primary/60 border border-erp-border rounded-lg hover:bg-erp-bg hover:text-erp-primary transition-colors"
+            (click)="limpiarFiltros()">
+      Limpiar filtros
+    </button>
+  </div>
+
+  <!-- Tabla (Card) -->
+  <div class="bg-erp-card border border-erp-border rounded-xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto" *ngIf="loading() || totalProveedores() > 0">
+      <table class="w-full text-left border-collapse min-w-[640px]">
+        <thead class="bg-erp-bg border-b border-erp-border">
+          <tr>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest">Nombre</th>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest hidden sm:table-cell">NIT</th>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest hidden md:table-cell">Teléfono</th>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest hidden lg:table-cell">Email</th>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest">Estado</th>
+            <th class="px-5 py-3 text-[11px] font-bold text-erp-primary/60 uppercase tracking-widest text-right">Acciones</th>
+          </tr>
+        </thead>
+
+        <!-- Skeleton Loading -->
+        <tbody *ngIf="loading()" class="animate-pulse">
+          <tr *ngFor="let i of [1,2,3,4,5]" class="border-b border-erp-border/50">
+            <td class="px-5 py-4"><div class="h-4 bg-erp-border/60 rounded w-32 mb-2"></div><div class="h-3 bg-erp-border/40 rounded w-20 sm:hidden"></div></td>
+            <td class="px-5 py-4 hidden sm:table-cell"><div class="h-4 bg-erp-border/50 rounded w-20"></div></td>
+            <td class="px-5 py-4 hidden md:table-cell"><div class="h-4 bg-erp-border/40 rounded w-24"></div></td>
+            <td class="px-5 py-4 hidden lg:table-cell"><div class="h-4 bg-erp-border/40 rounded w-32"></div></td>
+            <td class="px-5 py-4"><div class="h-6 bg-erp-border/50 rounded-full w-20"></div></td>
+            <td class="px-5 py-4 flex justify-end gap-2"><div class="h-8 w-16 bg-erp-border/50 rounded-md"></div><div class="h-8 w-20 bg-erp-border/50 rounded-md"></div></td>
+          </tr>
+        </tbody>
+
+        <!-- Datos de la tabla -->
+        <tbody *ngIf="!loading()">
+          <tr *ngFor="let proveedor of paginatedProveedores(); trackBy: trackByProveedorId"
+              class="border-b border-erp-border/50 hover:bg-erp-bg/50 transition-colors group">
+            <td class="px-5 py-4">
+              <div class="font-bold text-erp-primary text-sm">{{ proveedor.nombre }}</div>
+              <div class="text-xs text-erp-primary/60 mt-0.5 sm:hidden">{{ proveedor.nit }}</div>
+            </td>
+            <td class="px-5 py-4 hidden sm:table-cell font-mono text-xs font-bold text-erp-primary/70">{{ proveedor.nit }}</td>
+            <td class="px-5 py-4 hidden md:table-cell text-sm text-erp-primary/70">{{ proveedor.telefono || '—' }}</td>
+            <td class="px-5 py-4 hidden lg:table-cell text-sm text-erp-primary/70">{{ proveedor.email || '—' }}</td>
+            <td class="px-5 py-4">
+              <span class="inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase border"
+                    [ngClass]="proveedor.activo ? 'bg-green-100 text-green-700 border-green-200' : 'bg-erp-critical/10 text-erp-critical border-erp-critical/20'">
+                {{ proveedor.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+
+            <!-- ACCIONES: según rol -->
+            <td class="px-5 py-4">
+              <div class="flex items-center justify-end gap-2">
+                <button type="button"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-erp-primary/70 bg-erp-bg/50 hover:bg-erp-bg hover:text-erp-secondary border border-transparent hover:border-erp-border transition-all"
+                        (click)="verProveedor(proveedor)">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  Ver
+                </button>
+
+                <button *ngIf="puedeEditar()" type="button"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-erp-primary/70 bg-erp-bg/50 hover:bg-erp-bg hover:text-erp-secondary border border-transparent hover:border-erp-border transition-all"
+                        (click)="editarProveedor(proveedor)">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  Editar
+                </button>
+
+                <button *ngIf="puedeActivar()" type="button"
+                        class="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold border border-transparent transition-all w-[100px] justify-center"
+                        [ngClass]="proveedor.activo ? 'text-erp-critical/80 bg-erp-critical/5 hover:bg-erp-critical/10 hover:text-erp-critical hover:border-erp-critical/20' : 'text-green-700 bg-green-50 hover:bg-green-100 hover:text-green-800 hover:border-green-200'"
+                        (click)="abrirConfirmacionEstado(proveedor)">
+                  @if (proveedor.activo) {
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    <span>Desactivar</span>
+                  } @else {
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Activar</span>
+                  }
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Estado: Sin proveedores -->
+    <div class="flex flex-col items-center justify-center p-14 text-center" *ngIf="!loading() && totalProveedores() === 0 && !hasFiltros()">
+      <div class="text-erp-primary/30 mb-4">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72l1.189-1.19A1.5 1.5 0 016.622 3h10.756a1.5 1.5 0 011.06.44l1.19 1.19a3 3 0 01-.621 4.72"></path></svg>
+      </div>
+      <p class="text-erp-primary/60 font-medium mb-5">No hay proveedores registrados</p>
+      <button *ngIf="puedeEditar()" type="button" class="px-5 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary transition-colors" (click)="nuevoProveedor()">+ Nuevo Proveedor</button>
+    </div>
+
+    <!-- Estado: Sin resultados de filtro -->
+    <div class="flex flex-col items-center justify-center p-14 text-center" *ngIf="!loading() && totalProveedores() === 0 && hasFiltros()">
+      <div class="text-erp-primary/30 mb-4">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <p class="text-erp-primary/60 font-medium mb-5">No hay proveedores que coincidan con los filtros</p>
+      <button type="button" class="px-5 py-2.5 border border-erp-border text-erp-primary rounded-lg hover:bg-erp-bg transition-colors font-medium" (click)="limpiarFiltros()">Limpiar filtros</button>
+    </div>
+
+    <!-- Paginación -->
+    <div class="flex flex-wrap items-center justify-between gap-4 p-4 border-t border-erp-border bg-erp-bg/30" *ngIf="!loading() && totalProveedores() > 0">
+      <span class="text-xs font-medium text-erp-primary/60">
+        Mostrando {{ rangoMostrado().desde }}-{{ rangoMostrado().hasta }} de {{ totalProveedores() }} proveedores
+      </span>
+
+      <div class="flex items-center gap-1.5">
+        <button type="button"
+                class="min-w-[32px] h-8 flex items-center justify-center rounded-md border border-erp-border bg-erp-card text-erp-primary text-sm font-medium hover:bg-erp-bg disabled:opacity-40 disabled:hover:bg-erp-card transition-all"
+                [disabled]="currentPage() === 1" (click)="irAPagina(currentPage() - 1)">‹</button>
+
+        <button *ngFor="let pagina of paginasVisibles()" type="button"
+                class="min-w-[32px] h-8 flex items-center justify-center rounded-md text-sm font-bold transition-all"
+                [class]="pagina === currentPage() ? 'bg-erp-secondary text-erp-card border-none shadow-sm' : 'border border-erp-border bg-erp-card text-erp-primary hover:bg-erp-bg'"
+                (click)="irAPagina(pagina)">{{ pagina }}</button>
+
+        <button type="button"
+                class="min-w-[32px] h-8 flex items-center justify-center rounded-md border border-erp-border bg-erp-card text-erp-primary text-sm font-medium hover:bg-erp-bg disabled:opacity-40 disabled:hover:bg-erp-card transition-all"
+                [disabled]="currentPage() === totalPages()" (click)="irAPagina(currentPage() + 1)">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="!!proveedorParaCambiarEstado()"
+  [titulo]="tituloConfirmacion()"
+  [mensaje]="mensajeConfirmacion()"
+  [variante]="proveedorParaCambiarEstado()?.activo ? 'danger' : 'success'"
+  [textoConfirmar]="proveedorParaCambiarEstado()?.activo ? 'Desactivar' : 'Activar'"
+  (confirmar)="confirmarCambioEstado()"
+  (cancelar)="cerrarConfirmacionEstado()">
+</app-confirm-dialog>
