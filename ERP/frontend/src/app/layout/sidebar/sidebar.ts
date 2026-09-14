@@ -27,7 +27,9 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Productos', icon: 'cube', path: '/productos' },
     { label: 'Proveedores', icon: 'truck', path: '/proveedores' },
     { label: 'Compras', icon: 'shopping-cart', path: '/compras' },
-    { label: 'Historial de compras', icon: 'clipboard-document-list', path: '/compras/historial' },
+    { label: 'Inventario', icon: 'archive-box', path: '/inventario' },
+    { label: 'Reportes', icon: 'document-chart-bar', path: '/reportes' },
+    //{ label: 'Historial de compras', icon: 'clipboard-document-list', path: '/compras/historial' },
   ],
   INVENTARIO: [
     { label: 'Dashboard', icon: 'home', path: '/dashboard' },
