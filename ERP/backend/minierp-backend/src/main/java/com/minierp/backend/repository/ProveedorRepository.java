@@ -15,10 +15,9 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, Long> {
     boolean existsByNit(String nit);
 
     @Query("SELECT p FROM Proveedor p " +
-           "WHERE (:activo IS NULL OR p.activo = :activo) " +
-           "AND (:texto IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) " +
-           "                     OR LOWER(p.nit) LIKE LOWER(CONCAT('%', :texto, '%'))) " +
-           "ORDER BY p.nombre")
-    List<Proveedor> filtrar(@Param("activo") Boolean activo,
-                            @Param("texto") String texto);
+       "WHERE (:activo IS NULL OR p.activo = :activo) " +
+       "AND (LOWER(p.nombre) LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%')) " +
+       "     OR LOWER(p.nit) LIKE LOWER(CONCAT('%', CAST(:texto AS string), '%'))) " +
+       "ORDER BY p.nombre")
+       List<Proveedor> filtrar(@Param("activo") Boolean activo, @Param("texto") String texto);
 }

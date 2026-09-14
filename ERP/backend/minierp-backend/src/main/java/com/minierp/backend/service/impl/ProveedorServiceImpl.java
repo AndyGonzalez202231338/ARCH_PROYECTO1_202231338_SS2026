@@ -29,7 +29,8 @@ public class ProveedorServiceImpl implements ProveedorService {
     @Override
     @Transactional(readOnly = true)
     public List<ProveedorResponse> listar(Boolean activo, String texto) {
-        return proveedorRepository.filtrar(activo, texto).stream()
+        String textoNorm = (texto == null || texto.isBlank()) ? "" : texto.trim();
+        return proveedorRepository.filtrar(activo, textoNorm).stream()
                 .map(this::toResponse)
                 .toList();
     }
