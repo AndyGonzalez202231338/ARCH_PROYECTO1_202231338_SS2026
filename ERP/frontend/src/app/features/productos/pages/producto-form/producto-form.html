@@ -1,0 +1,170 @@
+<app-toast></app-toast>
+
+<div class="flex flex-col gap-6 font-sans">
+
+  <!-- Header del Formulario -->
+  <div class="flex flex-col">
+    <nav class="text-[13px] text-erp-primary/60 font-medium mb-3 flex items-center gap-2">
+      <span>Inicio</span>
+      <span>/</span>
+      <a routerLink="/productos" class="hover:text-erp-secondary transition-colors cursor-pointer">Productos</a>
+      <span>/</span>
+      <span class="text-erp-primary font-bold">{{ breadcrumbActual() }}</span>
+    </nav>
+
+    <button type="button" class="self-start text-[13px] font-bold text-erp-secondary hover:text-erp-primary hover:underline transition-all flex items-center gap-1 mb-2" (click)="cancelar()">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+      Volver
+    </button>
+
+    <h1 class="text-2xl md:text-3xl font-extrabold text-erp-primary tracking-tight">
+      {{ titulo() }}
+    </h1>
+  </div>
+
+  <!-- Formulario -->
+  <div class="bg-erp-card border border-erp-border rounded-xl shadow-sm max-w-2xl w-full mx-auto p-6 md:p-8" *ngIf="!cargandoDatos()">
+
+    <h2 class="text-lg font-extrabold text-erp-primary mb-6 border-b border-erp-border/50 pb-4">
+      Información del Producto
+    </h2>
+
+    <form [formGroup]="form" class="flex flex-col gap-5" (ngSubmit)="guardar()">
+
+      <!-- Código -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Código <span class="text-erp-critical">*</span>
+        </label>
+        <input type="text" formControlName="codigo" maxlength="20" placeholder="Ej. PRD-030"
+               class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+        <p *ngIf="campoInvalido('codigo')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          El código es requerido (máximo 20 caracteres).
+        </p>
+      </div>
+
+      <!-- Nombre -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Nombre <span class="text-erp-critical">*</span>
+        </label>
+        <input type="text" formControlName="nombre" maxlength="150" placeholder="Ej. Mouse inalámbrico"
+               class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+        <p *ngIf="campoInvalido('nombre')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          El nombre es requerido (máximo 150 caracteres).
+        </p>
+      </div>
+
+      <!-- Descripción -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">Descripción</label>
+        <textarea formControlName="descripcion" rows="3" placeholder="Descripción opcional del producto"
+                  class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30 resize-none"></textarea>
+      </div>
+
+      <!-- Categoría -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13px] font-bold text-erp-primary">
+          Categoría <span class="text-erp-critical">*</span>
+        </label>
+        <select formControlName="categoriaId"
+                class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all cursor-pointer">
+          <option [ngValue]="null" disabled>Selecciona una categoría</option>
+          <option *ngFor="let categoria of categorias()" [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+        </select>
+        <p *ngIf="campoInvalido('categoriaId')" class="text-xs font-semibold text-erp-critical mt-0.5">
+          Selecciona una categoría válida.
+        </p>
+      </div>
+
+      <!-- Precios -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-erp-primary">
+            Precio de compra (Q) <span class="text-erp-critical">*</span>
+          </label>
+          <input type="number" formControlName="precioCompra" min="0" step="0.01" placeholder="0.00"
+                 class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+          <p *ngIf="campoInvalido('precioCompra')" class="text-xs font-semibold text-erp-critical mt-0.5">
+            Ingresa un precio de compra válido (mayor o igual a 0).
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-erp-primary">
+            Precio de venta (Q) <span class="text-erp-critical">*</span>
+          </label>
+          <input type="number" formControlName="precioVenta" min="0" step="0.01" placeholder="0.00"
+                 class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+          <p *ngIf="campoInvalido('precioVenta')" class="text-xs font-semibold text-erp-critical mt-0.5">
+            Ingresa un precio de venta válido (mayor o igual a 0).
+          </p>
+        </div>
+      </div>
+
+      <!-- Unidad de medida + Stock mínimo -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-erp-primary">
+            Unidad de medida <span class="text-erp-critical">*</span>
+          </label>
+          <select formControlName="unidadMedida"
+                  class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all cursor-pointer">
+            <option *ngFor="let unidad of unidadesMedida" [value]="unidad">{{ unidad }}</option>
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13px] font-bold text-erp-primary">
+            Stock mínimo <span class="text-erp-critical">*</span>
+          </label>
+          <input type="number" formControlName="stockMinimo" min="0" step="1" placeholder="0"
+                 class="w-full bg-erp-bg/50 border border-erp-border rounded-lg px-4 py-2.5 text-sm text-erp-primary focus:outline-none focus:border-erp-secondary focus:bg-erp-card focus:ring-2 focus:ring-erp-secondary/20 transition-all placeholder:text-erp-primary/30" />
+          <p *ngIf="campoInvalido('stockMinimo')" class="text-xs font-semibold text-erp-critical mt-0.5">
+            Ingresa un stock mínimo válido (mayor o igual a 0).
+          </p>
+        </div>
+      </div>
+
+      <p class="text-xs text-erp-primary/50 -mt-2">
+        El stock actual no se edita aquí: se calcula automáticamente a partir de los movimientos de inventario.
+      </p>
+
+      <!-- Switch Activo/Inactivo -->
+      <div class="flex items-center gap-3 mt-2">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" formControlName="activo" class="sr-only peer" />
+          <div class="w-11 h-6 bg-erp-border/80 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-erp-secondary focus:ring-2 focus:ring-erp-secondary/30"></div>
+        </label>
+        <span class="text-[14px] font-bold text-erp-primary">Producto activo en el catálogo</span>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="flex flex-col sm:flex-row items-center justify-end gap-3 mt-6 pt-6 border-t border-erp-border/50">
+        <button type="button" class="w-full sm:w-auto px-6 py-2.5 bg-erp-card border border-erp-border text-erp-primary font-bold rounded-lg hover:bg-erp-bg transition-colors" (click)="cancelar()">
+          Cancelar
+        </button>
+        <button type="submit"
+                class="w-full sm:w-auto px-6 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm focus:outline-none focus:ring-4 focus:ring-erp-secondary/30"
+                [disabled]="form.invalid || guardando()">
+          {{ guardando() ? 'Guardando cambios...' : textoBoton() }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Skeleton Loading (Cargando datos) -->
+  <div class="bg-erp-card border border-erp-border rounded-xl shadow-sm max-w-2xl w-full mx-auto p-6 md:p-8 animate-pulse" *ngIf="cargandoDatos()">
+    <div class="h-6 bg-erp-border/60 rounded w-1/3 mb-8"></div>
+    <div class="flex flex-col gap-6">
+      <div class="h-12 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-12 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-20 bg-erp-border/40 rounded-lg w-full"></div>
+      <div class="h-12 bg-erp-border/40 rounded-lg w-1/2"></div>
+      <div class="flex justify-end gap-3 mt-4">
+        <div class="h-10 bg-erp-border/50 rounded-lg w-24"></div>
+        <div class="h-10 bg-erp-border/60 rounded-lg w-32"></div>
+      </div>
+    </div>
+  </div>
+</div>
