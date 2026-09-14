@@ -1,0 +1,93 @@
+$color-texto: #1f2937;
+$color-texto-secundario: #6b7280;
+$color-borde: #e5e7eb;
+$color-superficie: #ffffff;
+$color-peligro: #ef4444;
+$color-exito: #10b981;
+$color-advertencia: #f59e0b;
+
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 16px;
+}
+
+.confirm-card {
+  background: $color-superficie;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  max-width: 400px;
+  width: 100%;
+  padding: 28px 24px 22px;
+  text-align: center;
+
+  &__icon {
+    font-size: 34px;
+    margin-bottom: 8px;
+  }
+
+  &--danger &__icon { color: $color-peligro; }
+  &--success &__icon { color: $color-exito; }
+  &--warning &__icon { color: $color-advertencia; }
+
+  &__title {
+    font-size: 17px;
+    font-weight: 700;
+    color: $color-texto;
+    margin: 4px 0 8px;
+  }
+
+  &__message {
+    font-size: 14px;
+    color: $color-texto-secundario;
+    line-height: 1.5;
+    margin: 0 0 22px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+}
+
+.btn {
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease, border-color 150ms ease;
+
+  &--secondary {
+    background: $color-superficie;
+    border-color: $color-borde;
+    color: $color-texto;
+
+    &:hover { background: #f9fafb; }
+  }
+
+  &--confirm-danger {
+    background: $color-peligro;
+    color: #fff;
+    &:hover { background: #dc2626; }
+  }
+
+  &--confirm-success {
+    background: $color-exito;
+    color: #fff;
+    &:hover { background: #059669; }
+  }
+
+  &--confirm-warning {
+    background: $color-advertencia;
+    color: #fff;
+    &:hover { background: #d97706; }
+  }
+}
