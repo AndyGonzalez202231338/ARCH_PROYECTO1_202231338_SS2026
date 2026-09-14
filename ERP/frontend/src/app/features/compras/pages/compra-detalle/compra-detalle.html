@@ -1,0 +1,114 @@
+<app-toast></app-toast>
+
+<div class="detalle-page">
+  <button type="button" class="btn-back" (click)="volver()">← Volver al listado</button>
+
+  @if (cargando()) {
+    <div class="detalle-card detalle-card--loading">
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+    </div>
+  } @else {
+    @if (compra(); as c) {
+    <div class="detalle-header">
+      <div>
+        <h1 class="detalle-header__numero">{{ c.numeroCompra }}</h1>
+        <p class="detalle-header__fecha">Registrada el {{ formatoFecha(c.fecha) }}</p>
+      </div>
+      <span [class]="estadoBadgeClass()">{{ c.estado }}</span>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Proveedor</h2>
+      <div class="info-grid">
+        <div class="info-grid__item">
+          <span class="info-grid__label">Nombre</span>
+          <span class="info-grid__value">{{ c.proveedorNombre }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Productos</h2>
+      <div class="detalle-table-wrap">
+        <table class="detalle-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (detalle of c.detalles; track detalle.id) {
+              <tr>
+                <td>{{ detalle.productoCodigo }}</td>
+                <td>{{ detalle.productoNombre }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>{{ formatoQuetzales(detalle.precioUnitario) }}</td>
+                <td class="col-subtotal">{{ formatoQuetzales(detalle.subtotal) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totales">
+        <div class="totales__row">
+          <span>Subtotal</span>
+          <span>{{ formatoQuetzales(c.subtotal) }}</span>
+        </div>
+        <div class="totales__row">
+          <span>IVA</span>
+          <span>{{ formatoQuetzales(c.impuesto) }}</span>
+        </div>
+        <div class="totales__row totales__row--total">
+          <span>TOTAL</span>
+          <span>{{ formatoQuetzales(c.total) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Información de la compra</h2>
+      <div class="info-grid">
+        <div class="info-grid__item">
+          <span class="info-grid__label">Registrada por</span>
+          <span class="info-grid__value">{{ c.usuarioNombre }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Estado actual</span>
+          <span class="info-grid__value">{{ c.estado }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if (puedeEditar() || puedeRecibir() || puedeCancelar()) {
+      <div class="detalle-acciones">
+        @if (puedeEditar()) {
+          <button type="button" class="btn btn--secondary" (click)="editar()">Editar compra</button>
+        }
+        @if (puedeRecibir()) {
+          <button type="button" class="btn btn--success" (click)="abrirRecibir()">Marcar como RECIBIDA</button>
+        }
+        @if (puedeCancelar()) {
+          <button type="button" class="btn btn--danger" (click)="abrirCancelar()">Cancelar compra</button>
+        }
+      </div>
+    }
+    }
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="confirmarAbierto()"
+  [titulo]="tituloConfirmacion()"
+  [mensaje]="mensajeConfirmacion()"
+  [variante]="accionEstado() === 'RECIBIDA' ? 'success' : 'danger'"
+  [textoConfirmar]="accionEstado() === 'RECIBIDA' ? 'Marcar como recibida' : 'Cancelar compra'"
+  (confirmar)="confirmarCambioEstado()"
+  (cancelar)="cerrarConfirmacion()">
+</app-confirm-dialog>

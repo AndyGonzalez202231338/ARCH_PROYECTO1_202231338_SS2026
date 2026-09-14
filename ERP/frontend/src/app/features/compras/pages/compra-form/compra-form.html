@@ -1,0 +1,149 @@
+<app-toast></app-toast>
+
+<div class="form-page">
+  <div class="form-page__header">
+    <nav class="breadcrumb">
+      <span>Inicio</span>
+      <span class="breadcrumb__sep">/</span>
+      <a routerLink="/compras">Compras</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">{{ breadcrumbActual() }}</span>
+    </nav>
+
+    <button type="button" class="btn-back" (click)="cancelar()">← Volver</button>
+    <h1 class="form-page__title">{{ titulo() }}</h1>
+  </div>
+
+  @if (cargandoDatos()) {
+    <div class="form-card form-card--loading">
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+    </div>
+  } @else {
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="form-row">
+          <div class="field">
+            <label class="field__label">Proveedor <span class="field__required">*</span></label>
+            <select class="field__input" formControlName="proveedorId">
+              <option [ngValue]="null" disabled>Selecciona un proveedor</option>
+              @for (proveedor of proveedores(); track proveedor.id) {
+                <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
+              }
+            </select>
+            @if (campoInvalido('proveedorId')) {
+              <p class="field__error">Selecciona un proveedor.</p>
+            }
+            @if (proveedorSeleccionado) {
+              <p class="field__hint">
+                NIT: {{ proveedorSeleccionado.nit }} · Tel: {{ proveedorSeleccionado.telefono }}
+              </p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">Estado</label>
+            <span class="estado-readonly">{{ estadoActual() }}</span>
+          </div>
+        </div>
+
+        <h2 class="form-card__section-title">Productos de la compra</h2>
+
+        <div class="detalle-table-wrap">
+          <table class="detalle-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio unitario</th>
+                <th>Subtotal</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="detalles">
+              @for (grupo of detalles.controls; track grupo; let i = $index) {
+                <tr [formGroupName]="i">
+                  <td class="col-producto">
+                    <input
+                      type="text"
+                      class="field__input field__input--search"
+                      placeholder="Buscar por código o nombre..."
+                      [value]="filtrosProducto()[i]"
+                      [disabled]="!puedeModificarDetalle()"
+                      (input)="onFiltroProductoChange(i, $any($event.target).value)" />
+                    <select
+                      class="field__input"
+                      [disabled]="!puedeModificarDetalle()"
+                      [value]="grupo.get('productoId')?.value ?? ''"
+                      (change)="onProductoSeleccionado(i, $any($event.target).value)">
+                      <option value="" disabled>Selecciona un producto</option>
+                      @for (producto of productosFiltrados(i); track producto.id) {
+                        <option [value]="producto.id">{{ producto.codigo }} — {{ producto.nombre }}</option>
+                      }
+                    </select>
+                    @if (detalleInvalido(i, 'productoId')) {
+                      <p class="field__error">Selecciona un producto.</p>
+                    }
+                  </td>
+                  <td class="col-cantidad">
+                    <input type="number" class="field__input" min="1" formControlName="cantidad" />
+                    @if (detalleInvalido(i, 'cantidad')) {
+                      <p class="field__error">Mínimo 1.</p>
+                    }
+                  </td>
+                  <td class="col-precio">
+                    <input type="number" class="field__input" min="0" step="0.01" formControlName="precioUnitario" />
+                    @if (detalleInvalido(i, 'precioUnitario')) {
+                      <p class="field__error">Debe ser ≥ 0.</p>
+                    }
+                  </td>
+                  <td class="col-subtotal">{{ formatoQuetzales(subtotalDe(i)) }}</td>
+                  <td class="col-quitar">
+                    <button
+                      type="button"
+                      class="action-btn action-btn--danger"
+                      [disabled]="!puedeModificarDetalle()"
+                      (click)="quitarProducto(i)">
+                      Quitar
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <button
+          type="button"
+          class="btn btn--secondary"
+          [disabled]="!puedeModificarDetalle()"
+          (click)="agregarProducto()">
+          + Agregar producto
+        </button>
+
+        <div class="totales">
+          <div class="totales__row">
+            <span>Subtotal</span>
+            <span>{{ formatoQuetzales(totales().subtotal) }}</span>
+          </div>
+          <div class="totales__row">
+            <span>IVA (19%)</span>
+            <span>{{ formatoQuetzales(totales().iva) }}</span>
+          </div>
+          <div class="totales__row totales__row--total">
+            <span>TOTAL</span>
+            <span>{{ formatoQuetzales(totales().total) }}</span>
+          </div>
+        </div>
+
+        <div class="form-card__actions">
+          <button type="button" class="btn btn--secondary" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn btn--primary" [disabled]="form.invalid || guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar Compra' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>

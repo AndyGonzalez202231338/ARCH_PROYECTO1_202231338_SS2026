@@ -5,7 +5,6 @@ import { AppLayout } from './layout/app-layout/app-layout';
 import { authGuard } from './core/guards/auth-guard';
 import { roleGuard } from './core/guards/role-guard';
 
-
 const placeholder = () =>
   import('./shared/placeholder-page/placeholder-page').then(
     m => m.PlaceholderPage
@@ -50,7 +49,7 @@ export const routes: Routes = [
         ],
       },
 
-      // --- Productos: ADMIN + INVENTARIO (full), COMPRAS + VENTAS (solo lectura) ---
+      // --- Productos ---
       {
         path: 'productos',
         canActivate: [roleGuard],
@@ -87,7 +86,7 @@ export const routes: Routes = [
         ],
       },
 
-      // --- Proveedores: ADMIN + COMPRAS ---
+      // --- Proveedores ---
       {
         path: 'proveedores',
         canActivate: [roleGuard],
@@ -124,7 +123,7 @@ export const routes: Routes = [
         ],
       },
 
-      // --- Clientes: ADMIN + VENTAS ---
+      // --- Clientes ---
       {
         path: 'clientes',
         canActivate: [roleGuard],
@@ -132,21 +131,39 @@ export const routes: Routes = [
         loadComponent: placeholder,
       },
 
-      // --- Compras: registrar (solo COMPRAS) vs consultar (ADMIN, COMPRAS full; INVENTARIO, VENTAS lectura) ---
+      // --- Compras ---
       {
         path: 'compras',
         canActivate: [roleGuard],
-        data: { permission: 'compras-registrar', title: 'Registrar compra' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'compras/historial',
-        canActivate: [roleGuard],
-        data: { permission: 'compras-consultar', title: 'Historial de compras' },
-        loadComponent: placeholder,
+        data: { permission: 'compras-consultar', title: 'Compras' },
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/compras/pages/compra-lista/compra-lista').then(
+                m => m.CompraLista,
+              ),
+          },
+          {
+            path: 'nueva',
+            canActivate: [roleGuard],
+            data: { permission: 'compras-registrar', title: 'Registrar compra' },
+            loadComponent: () =>
+              import('./features/compras/pages/compra-form/compra-form').then(
+                m => m.CompraForm,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/compras/pages/compra-detalle/compra-detalle').then(
+                m => m.CompraDetalle,
+              ),
+          },
+        ],
       },
 
-      // --- Ventas: registrar (solo VENTAS) vs consultar (ADMIN, VENTAS full; COMPRAS, INVENTARIO lectura) ---
+      // --- Ventas ---
       {
         path: 'ventas',
         canActivate: [roleGuard],
@@ -166,7 +183,7 @@ export const routes: Routes = [
         loadComponent: placeholder,
       },
 
-      // --- Inventario: stock, movimientos, ajustes -> ADMIN + INVENTARIO (full); COMPRAS + VENTAS solo lectura en stock ---
+      // --- Inventario ---
       {
         path: 'inventario',
         canActivate: [roleGuard],
@@ -186,7 +203,7 @@ export const routes: Routes = [
         loadComponent: placeholder,
       },
 
-      // --- Reportes: visible para los 4 roles, el alcance se filtra dentro del componente ---
+      // --- Reportes ---
       {
         path: 'reportes',
         canActivate: [roleGuard],

@@ -1,0 +1,158 @@
+<app-toast></app-toast>
+
+<div class="compras-page">
+  <div class="page-header">
+    <div class="page-header__text">
+      <nav class="breadcrumb">
+        <span>Inicio</span>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Compras</span>
+      </nav>
+      <h1 class="page-header__title">Gestión de Compras</h1>
+      <p class="page-header__subtitle">{{ subtitulo() }}</p>
+    </div>
+
+    @if (puedeGestionar()) {
+      <button type="button" class="btn btn--primary" (click)="nuevaCompra()">
+        + Nueva Compra
+      </button>
+    }
+  </div>
+
+  <div class="filters-bar">
+    <div class="filters-bar__field">
+      <label>Desde</label>
+      <input type="date" [value]="desde()" (change)="onDesdeChange($any($event.target).value)" />
+    </div>
+
+    <div class="filters-bar__field">
+      <label>Hasta</label>
+      <input type="date" [value]="hasta()" (change)="onHastaChange($any($event.target).value)" />
+    </div>
+
+    <select class="filters-bar__select" [value]="proveedorFilter() ?? ''" (change)="onProveedorChange($any($event.target).value)">
+      <option value="">Todos los proveedores</option>
+      @for (proveedor of proveedores(); track proveedor.id) {
+        <option [value]="proveedor.id">{{ proveedor.nombre }}</option>
+      }
+    </select>
+
+    <select class="filters-bar__select" [value]="estadoFilter()" (change)="onEstadoChange($any($event.target).value)">
+      <option value="todos">Todos los estados</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="EN_TRANSITO">En tránsito</option>
+      <option value="RECIBIDA">Recibida</option>
+      <option value="CANCELADA">Cancelada</option>
+    </select>
+
+    @if (hasFiltros()) {
+      <button type="button" class="btn btn--ghost" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <div class="table-card">
+    @if (loading() || totalCompras() > 0) {
+      <table class="compras-table">
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Proveedor</th>
+            <th>Fecha</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th class="col-actions">Acciones</th>
+          </tr>
+        </thead>
+
+        @if (loading()) {
+          <tbody>
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <tr class="skeleton-row">
+                <td><div class="skeleton skeleton--sm"></div></td>
+                <td><div class="skeleton skeleton--lg"></div></td>
+                <td><div class="skeleton skeleton--sm"></div></td>
+                <td><div class="skeleton skeleton--sm"></div></td>
+                <td><div class="skeleton skeleton--badge"></div></td>
+                <td class="col-actions"><div class="skeleton skeleton--actions"></div></td>
+              </tr>
+            }
+          </tbody>
+        } @else {
+          <tbody>
+            @for (compra of paginatedCompras(); track compra.id) {
+              <tr>
+                <td class="compra-numero">{{ compra.numeroCompra }}</td>
+                <td>{{ compra.proveedorNombre }}</td>
+                <td class="text-muted">{{ formatoFecha(compra.fecha) }}</td>
+                <td>{{ formatoQuetzales(compra.total) }}</td>
+                <td>
+                  <span [class]="estadoBadgeClass(compra.estado)">{{ compra.estado }}</span>
+                </td>
+                <td class="col-actions">
+                  <div class="acciones">
+                    <button type="button" class="action-btn" (click)="verDetalle(compra)">Ver</button>
+
+                    @if (puedeEditar(compra)) {
+                      <button type="button" class="action-btn" (click)="editarCompra(compra)">Editar</button>
+                    }
+
+                    @if (puedeCambiarEstado(compra)) {
+                      <button type="button" class="action-btn action-btn--success" (click)="abrirRecibir(compra)">
+                        Recibir
+                      </button>
+                      <button type="button" class="action-btn action-btn--danger" (click)="abrirCancelar(compra)">
+                        Cancelar
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        }
+      </table>
+    }
+
+    @if (!loading() && totalCompras() === 0) {
+      <div class="empty-state">
+        <div class="empty-state__icon"></div>
+        <p class="empty-state__title">No hay compras que coincidan con los filtros</p>
+        @if (hasFiltros()) {
+          <button type="button" class="btn btn--secondary" (click)="limpiarFiltros()">Limpiar filtros</button>
+        }
+      </div>
+    }
+
+    @if (!loading() && totalCompras() > 0) {
+      <div class="pagination">
+        <span class="pagination__info">
+          Mostrando {{ rangoMostrado().desde }}-{{ rangoMostrado().hasta }} de {{ totalCompras() }} compras
+        </span>
+
+        <div class="pagination__controls">
+          <button type="button" class="pagination__btn" [disabled]="currentPage() === 1" (click)="irAPagina(currentPage() - 1)">‹</button>
+          @for (pagina of paginasVisibles(); track pagina) {
+            <button
+              type="button"
+              class="pagination__btn"
+              [class.pagination__btn--active]="pagina === currentPage()"
+              (click)="irAPagina(pagina)">{{ pagina }}</button>
+          }
+          <button type="button" class="pagination__btn" [disabled]="currentPage() === totalPages()" (click)="irAPagina(currentPage() + 1)">›</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="!!compraParaEstado()"
+  [titulo]="tituloConfirmacion()"
+  [mensaje]="mensajeConfirmacion()"
+  [variante]="accionEstado() === 'RECIBIDA' ? 'success' : 'danger'"
+  [textoConfirmar]="accionEstado() === 'RECIBIDA' ? 'Marcar como recibida' : 'Cancelar compra'"
+  (confirmar)="confirmarCambioEstado()"
+  (cancelar)="cerrarConfirmacionEstado()">
+</app-confirm-dialog>

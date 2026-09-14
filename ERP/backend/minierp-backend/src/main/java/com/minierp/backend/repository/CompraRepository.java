@@ -32,15 +32,15 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
      * Filtro por rango de fechas, proveedor y estado.
      */
     @Query("SELECT c FROM Compra c JOIN FETCH c.proveedor " +
-           "WHERE (:fechaDesde IS NULL OR c.fecha >= :fechaDesde) " +
-           "AND (:fechaHasta IS NULL OR c.fecha <= :fechaHasta) " +
-           "AND (:proveedorId IS NULL OR c.proveedor.id = :proveedorId) " +
-           "AND (:estado IS NULL OR c.estado = :estado) " +
-           "ORDER BY c.fecha DESC")
-    List<Compra> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
-                         @Param("fechaHasta") LocalDateTime fechaHasta,
-                         @Param("proveedorId") Long proveedorId,
-                         @Param("estado") EstadoCompra estado);
+       "WHERE (CAST(:fechaDesde AS timestamp) IS NULL OR c.fecha >= :fechaDesde) " +
+       "AND (CAST(:fechaHasta AS timestamp) IS NULL OR c.fecha <= :fechaHasta) " +
+       "AND (:proveedorId IS NULL OR c.proveedor.id = :proveedorId) " +
+       "AND (CAST(:estado AS string) IS NULL OR c.estado = :estado) " +
+       "ORDER BY c.fecha DESC")
+       List<Compra> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
+                     @Param("fechaHasta") LocalDateTime fechaHasta,
+                     @Param("proveedorId") Long proveedorId,
+                     @Param("estado") EstadoCompra estado);
 
     /**
      * Top N proveedores con mayor monto acumulado de compras.
