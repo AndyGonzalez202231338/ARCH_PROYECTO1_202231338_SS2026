@@ -55,7 +55,36 @@ export const routes: Routes = [
         path: 'productos',
         canActivate: [roleGuard],
         data: { permission: 'productos', title: 'Productos' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/productos/pages/producto-lista/producto-lista').then(
+                m => m.ProductoLista,
+              ),
+          },
+          {
+            path: 'nuevo',
+            loadComponent: () =>
+              import('./features/productos/pages/producto-form/producto-form').then(
+                m => m.ProductoForm,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/productos/pages/producto-detalle/producto-detalle').then(
+                m => m.ProductoDetalle,
+              ),
+          },
+          {
+            path: ':id/editar',
+            loadComponent: () =>
+              import('./features/productos/pages/producto-form/producto-form').then(
+                m => m.ProductoForm,
+              ),
+          },
+        ],
       },
 
       // --- Proveedores: ADMIN + COMPRAS ---

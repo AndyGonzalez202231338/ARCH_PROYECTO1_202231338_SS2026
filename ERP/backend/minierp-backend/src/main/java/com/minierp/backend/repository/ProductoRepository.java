@@ -19,14 +19,14 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
      * en nombre o código.
      */
     @Query("SELECT p FROM Producto p JOIN FETCH p.categoria c " +
-           "WHERE (:categoriaId IS NULL OR c.id = :categoriaId) " +
-           "AND (:activo IS NULL OR p.activo = :activo) " +
-           "AND (:texto IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) " +
-           "                     OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :texto, '%'))) " +
-           "ORDER BY p.nombre")
-    List<Producto> filtrar(@Param("categoriaId") Long categoriaId,
-                           @Param("activo") Boolean activo,
-                           @Param("texto") String texto);
+       "WHERE (:categoriaId IS NULL OR c.id = :categoriaId) " +
+       "AND (:activo IS NULL OR p.activo = :activo) " +
+       "AND (LOWER(p.nombre) LIKE LOWER(CONCAT('%', :texto, '%')) " +
+       "     OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :texto, '%'))) " +
+       "ORDER BY p.nombre")
+List<Producto> filtrar(@Param("categoriaId") Long categoriaId,
+                       @Param("activo") Boolean activo,
+                       @Param("texto") String texto);
 
     /**
      * Productos con stock_actual <= stock_minimo (o un umbral dado).

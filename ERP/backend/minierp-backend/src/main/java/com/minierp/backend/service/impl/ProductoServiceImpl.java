@@ -32,7 +32,11 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductoResponse> listar(Long categoriaId, Boolean activo, String texto) {
-        return productoRepository.filtrar(categoriaId, activo, texto).stream()
+        // Normalizar: si viene null o vacío, usar "" para evitar problemas de
+        // inferencia de tipo en PostgreSQL (lower(bytea)).
+        String textoNorm = (texto == null || texto.isBlank()) ? "" : texto.trim();
+
+        return productoRepository.filtrar(categoriaId, activo, textoNorm).stream()
                 .map(this::toResponse)
                 .toList();
     }
@@ -63,7 +67,7 @@ public class ProductoServiceImpl implements ProductoService {
                 .precioCompra(request.getPrecioCompra())
                 .precioVenta(request.getPrecioVenta())
                 .unidadMedida(request.getUnidadMedida())
-                .stockActual(0)                       // ⚠️ siempre inicia en 0
+                .stockActual(0)                       // siempre inicia en 0
                 .stockMinimo(request.getStockMinimo())
                 .activo(request.getActivo() == null || request.getActivo())
                 .build();
