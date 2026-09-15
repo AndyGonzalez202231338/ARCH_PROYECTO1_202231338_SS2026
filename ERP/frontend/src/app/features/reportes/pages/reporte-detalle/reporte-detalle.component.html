@@ -1,0 +1,372 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <button type="button" class="btn btn--secondary btn--sm" routerLink="/reportes">
+        ← Volver a reportes
+      </button>
+      <nav class="breadcrumb">
+        Inicio / <a routerLink="/reportes">Reportes</a> /
+        <span>{{ config()?.titulo ?? 'Reporte' }}</span>
+      </nav>
+      <h1 class="page__title">{{ config()?.titulo ?? 'Reporte' }}</h1>
+      <p class="page__subtitle">{{ config()?.descripcion ?? '' }}</p>
+    </div>
+  </header>
+
+  @if (!puedeVer()) {
+    <div class="empty">
+      <span class="empty__icon"></span>
+      <p>No tienes permiso para este reporte.</p>
+    </div>
+  } @else {
+
+    <!-- Filtros -->
+    <div class="filters">
+      @if (mostrarProducto()) {
+        <label class="filters__label">
+          Producto
+          <select class="input" [ngModel]="productoId()"
+                  (ngModelChange)="productoId.set($event ? +$event : null)">
+            <option [ngValue]="null">— Selecciona un producto —</option>
+            @for (p of productos(); track p.id) {
+              <option [ngValue]="p.id">{{ p.codigo }} · {{ p.nombre }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      @if (mostrarFechas()) {
+        <label class="filters__label">
+          Desde
+          <input type="date" class="input" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+        </label>
+        <label class="filters__label">
+          Hasta
+          <input type="date" class="input" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+        </label>
+      }
+
+      @if (mostrarTop()) {
+        <label class="filters__label">
+          Top
+          <select class="input" [ngModel]="top()" (ngModelChange)="top.set(+$event)">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="15">15</option>
+            <option [ngValue]="20">20</option>
+          </select>
+        </label>
+      }
+
+      @if (mostrarAgrupacion()) {
+        <label class="filters__label">
+          Agrupación
+          <select class="input" [ngModel]="agrupacion()" (ngModelChange)="agrupacion.set($event)">
+            <option value="DIA">Día</option>
+            <option value="MES">Mes</option>
+            <option value="ANIO">Año</option>
+          </select>
+        </label>
+      }
+
+      @if (tipo() === 'logs-auditoria') {
+        <label class="filters__label">
+          Texto
+          <input type="text" class="input" placeholder="Buscar…"
+                 [ngModel]="texto()" (ngModelChange)="texto.set($event)" />
+        </label>
+      }
+
+      <button class="btn btn--primary" type="button" (click)="aplicar()">Aplicar filtros</button>
+      <button class="btn btn--ghost"   type="button" (click)="limpiar()">Limpiar filtros</button>
+
+      <button class="btn btn--secondary filters__export" type="button" (click)="exportarCsv()">
+        ⬇ Exportar a CSV
+      </button>
+    </div>
+
+    <!-- Resultados -->
+    @if (loading()) {
+      <div class="table-wrap">
+        <table class="table">
+          <tbody>
+            @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
+              <tr class="skeleton-row"><td><div class="skeleton"></div></td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (sinResultados()) {
+      <div class="empty">
+        <span class="empty__icon">📭</span>
+        <p>No hay datos para los filtros seleccionados</p>
+      </div>
+    } @else {
+
+      @switch (tipo()) {
+
+        <!-- ===== Top Productos (mas vendidos / mas movimientos / mas adquiridos / mayores ingresos) ===== -->
+        @case ('productos-mas-vendidos') {
+          <ng-container *ngTemplateOutlet="tablaTop; context: { $implicit: topProductos() }"></ng-container>
+        }
+        @case ('productos-mas-movimientos') {
+          <ng-container *ngTemplateOutlet="tablaTop; context: { $implicit: topProductos() }"></ng-container>
+        }
+        @case ('productos-mas-adquiridos') {
+          <ng-container *ngTemplateOutlet="tablaTop; context: { $implicit: topProductos() }"></ng-container>
+        }
+        @case ('productos-mayores-ingresos') {
+          <ng-container *ngTemplateOutlet="tablaTop; context: { $implicit: topProductos() }"></ng-container>
+        }
+
+        <!-- ===== Productos con menor existencia ===== -->
+        @case ('productos-menor-existencia') {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Código</th><th>Producto</th>
+                  <th>Stock actual</th><th>Stock mínimo</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of bajoStock(); track p.productoId) {
+                  <tr>
+                    <td class="mono">{{ p.codigo }}</td>
+                    <td>{{ p.nombre }}</td>
+                    <td><span class="badge badge--danger">{{ p.stockActual }}</span></td>
+                    <td class="mono">{{ p.stockMinimo }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Top Proveedores ===== -->
+        @case ('top-proveedores') {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>#</th><th>Proveedor</th><th>Compras</th><th>Monto total</th></tr>
+              </thead>
+              <tbody>
+                @for (p of topProveedores(); track p.proveedorId; let i = $index) {
+                  <tr [class.row--first]="i === 0">
+                    <td class="pos">
+                      @if (i === 0) { <span class="medal">🥇</span> } @else { {{ i + 1 }} }
+                    </td>
+                    <td>{{ p.nombre }}</td>
+                    <td class="mono">{{ p.cantidadCompras }}</td>
+                    <td class="mono">{{ p.montoTotal | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Top Clientes ===== -->
+        @case ('top-clientes') {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>#</th><th>Cliente</th><th>Ventas</th><th>Monto total</th></tr>
+              </thead>
+              <tbody>
+                @for (c of topClientes(); track c.clienteId; let i = $index) {
+                  <tr [class.row--first]="i === 0">
+                    <td class="pos">
+                      @if (i === 0) { <span class="medal">🥇</span> } @else { {{ i + 1 }} }
+                    </td>
+                    <td>{{ c.nombre }}</td>
+                    <td class="mono">{{ c.cantidadVentas }}</td>
+                    <td class="mono">{{ c.montoTotal | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Compras por rango ===== -->
+        @case ('compras-por-rango') {
+          <div class="result-head">
+            <strong>{{ compras().length }}</strong> compras encontradas
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Número</th><th>Proveedor</th><th>Fecha</th><th>Total</th><th>Estado</th><th class="ta-r">Acciones</th></tr>
+              </thead>
+              <tbody>
+                @for (c of compras(); track c.id) {
+                  <tr>
+                    <td class="mono">{{ c.numeroCompra }}</td>
+                    <td>{{ c.proveedorNombre }}</td>
+                    <td class="mono">{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td class="mono">{{ c.total | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                    <td><span class="badge badge--info">{{ c.estado }}</span></td>
+                    <td class="ta-r">
+                      <a class="btn btn--secondary btn--sm" [routerLink]="['/compras', c.id]">Ver detalle</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Ventas por rango ===== -->
+        @case ('ventas-por-rango') {
+          <div class="result-head">
+            <strong>{{ ventas().length }}</strong> ventas encontradas
+          </div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Número</th><th>Cliente</th><th>Fecha</th><th>Total</th><th>Estado</th><th class="ta-r">Acciones</th></tr>
+              </thead>
+              <tbody>
+                @for (v of ventas(); track v.id) {
+                  <tr>
+                    <td class="mono">{{ v.numeroVenta }}</td>
+                    <td>{{ v.clienteNombre }}</td>
+                    <td class="mono">{{ v.fecha | date:'dd/MM/yyyy' }}</td>
+                    <td class="mono">{{ v.total | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                    <td><span class="badge badge--info">{{ v.estado }}</span></td>
+                    <td class="ta-r">
+                      <a class="btn btn--secondary btn--sm" [routerLink]="['/ventas', v.id]">Ver detalle</a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Resumen de ventas por período ===== -->
+        @case ('resumen-ventas') {
+          <div class="chart">
+            @for (r of resumen(); track r.periodo) {
+              <div class="chart__col">
+                <div class="chart__value">
+                  {{ r.totalVentas | currency:'GTQ':'symbol-narrow':'1.0-0' }}
+                </div>
+                <div class="chart__bar-wrap">
+                  <div class="chart__bar" [style.height]="alturaBarra(r.totalVentas)"></div>
+                </div>
+                <div class="chart__label">{{ r.periodo }}</div>
+              </div>
+            }
+          </div>
+
+          <div class="table-wrap" style="margin-top: 16px;">
+            <table class="table">
+              <thead>
+                <tr><th>Período</th><th>Cantidad ventas</th><th>Total</th></tr>
+              </thead>
+              <tbody>
+                @for (r of resumen(); track r.periodo) {
+                  <tr>
+                    <td class="mono">{{ r.periodo }}</td>
+                    <td class="mono">{{ r.cantidadVentas }}</td>
+                    <td class="mono">{{ r.totalVentas | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Historial de movimientos ===== -->
+        @case ('historial-movimientos') {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Fecha</th><th>Tipo</th><th>Cantidad</th>
+                  <th>Costo Unit.</th><th>Referencia</th><th>Usuario</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (m of movimientos(); track m.id) {
+                  <tr>
+                    <td class="mono">{{ m.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      <span class="badge"
+                            [class.badge--success]="m.tipoMovimiento === 'ENTRADA'"
+                            [class.badge--danger]="m.tipoMovimiento === 'SALIDA'">
+                        {{ m.tipoMovimiento }}
+                      </span>
+                    </td>
+                    <td class="mono">{{ m.cantidad }}</td>
+                    <td class="mono">{{ m.costoUnitario | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+                    <td><a class="link" [routerLink]="refLink(m)">{{ m.referenciaTipo }} #{{ m.referenciaId }}</a></td>
+                    <td>{{ m.usuarioNombre }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <!-- ===== Logs de auditoría ===== -->
+        @case ('logs-auditoria') {
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr><th>Fecha</th><th>Usuario</th><th>Módulo</th><th>Acción</th><th>Detalle</th></tr>
+              </thead>
+              <tbody>
+                @for (l of logs(); track l.id) {
+                  <tr>
+                    <td class="mono">{{ l.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ l.usuarioNombre }}</td>
+                    <td><span class="badge badge--info">{{ l.modulo }}</span></td>
+                    <td>{{ l.tipoAccion }}</td>
+                    <td class="detalle">{{ l.detalle }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    }
+  }
+</section>
+
+<!-- ===== Template reutilizable para reportes Top de productos ===== -->
+<ng-template #tablaTop let-items>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Código</th>
+          <th>Producto</th>
+          <th>{{ esMonto(tipo()) ? 'Ingresos' : 'Valor' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (p of items; track p.productoId; let i = $index) {
+          <tr [class.row--first]="i === 0">
+            <td class="pos">
+              @if (i === 0) { <span class="medal"></span> } @else { {{ i + 1 }} }
+            </td>
+            <td class="mono">{{ p.codigo ?? '—' }}</td>
+            <td>{{ p.nombre }}</td>
+            <td class="mono">
+              @if (esMonto(tipo())) {
+                {{ p.valor | currency:'GTQ':'symbol-narrow':'1.2-2' }}
+              } @else {
+                {{ p.valor }}
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</ng-template>

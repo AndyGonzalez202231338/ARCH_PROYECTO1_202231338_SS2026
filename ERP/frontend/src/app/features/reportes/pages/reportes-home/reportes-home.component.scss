@@ -1,0 +1,85 @@
+// src/app/features/reportes/pages/reportes-home/reportes-home.component.scss
+$primary: #0d3b2e;
+$primary-h: #1a5f4a;
+$bg: #f5f7fa;
+$surface: #ffffff;
+$text: #1f2937;
+$text-sec: #6b7280;
+$border: #e5e7eb;
+
+:host { display: block; }
+
+.page {
+  padding: 24px;
+  background: $bg;
+  min-height: 100%;
+  color: $text;
+}
+
+.page__head { margin-bottom: 24px; }
+.breadcrumb {
+  font-size: 12px; color: $text-sec; margin-bottom: 6px;
+  span { color: $text; font-weight: 600; }
+}
+.page__title { font-size: 24px; font-weight: 700; margin: 0 0 4px; }
+.page__subtitle { font-size: 14px; color: $text-sec; margin: 0; }
+
+.seccion { margin-bottom: 28px; }
+.seccion__title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 16px; font-weight: 700; color: $text;
+  margin: 0 0 12px;
+}
+.seccion__icon { font-size: 20px; }
+
+.grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 640px)  { grid-template-columns: 1fr; }
+}
+
+.card {
+  position: relative;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 10px;
+  padding: 20px 18px 44px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 6px 18px rgba(13, 59, 46, .12);
+    transform: translateY(-2px);
+    .card__arrow { color: $primary; transform: translateX(4px); }
+  }
+  &:focus-visible { outline: 2px solid $primary; outline-offset: 2px; }
+
+  &__icon { display: block; font-size: 32px; margin-bottom: 10px; }
+  &__title { font-size: 16px; font-weight: 700; margin: 0 0 6px; color: $text; }
+  &__desc { font-size: 13px; color: $text-sec; margin: 0; line-height: 1.45; }
+
+  &__badge {
+    position: absolute; top: 14px; right: 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 3px 9px; border-radius: 999px;
+    &--top      { background: #dbeafe; color: #1e40af; }
+    &--rango    { background: #fef3c7; color: #92400e; }
+    &--detalle  { background: #dcfce7; color: #166534; }
+  }
+
+  &__arrow {
+    position: absolute; right: 18px; bottom: 16px;
+    font-size: 18px; color: $text-sec;
+    transition: color .15s ease, transform .15s ease;
+  }
+}
+
+.empty {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 80px 16px; color: $text-sec;
+  &__icon { font-size: 52px; }
+  p { margin: 0; font-size: 15px; }
+}
