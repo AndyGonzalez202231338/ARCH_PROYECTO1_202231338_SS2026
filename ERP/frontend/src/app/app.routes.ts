@@ -259,7 +259,20 @@ export const routes: Routes = [
         path: 'reportes',
         canActivate: [roleGuard],
         data: { permission: 'reportes', title: 'Reportes' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/reportes/pages/reportes-home/reportes-home.component')
+                .then(m => m.ReportesHomeComponent),
+          },
+          {
+            path: ':tipo',
+            loadComponent: () =>
+              import('./features/reportes/pages/reporte-detalle/reporte-detalle.component')
+                .then(m => m.ReporteDetalleComponent),
+          },
+        ],
       },
 
       // --- Logs de auditoría: solo ADMIN ---

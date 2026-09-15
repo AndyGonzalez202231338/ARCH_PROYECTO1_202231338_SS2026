@@ -1,0 +1,41 @@
+<section class="page">
+  <header class="page__head">
+    <nav class="breadcrumb">Inicio / <span>Reportes</span></nav>
+    <h1 class="page__title">Reportes</h1>
+    <p class="page__subtitle">Analiza la información comercial del sistema</p>
+  </header>
+
+  @if (sinReportes()) {
+    <div class="empty">
+      <span class="empty__icon"></span>
+      <p>No tienes reportes disponibles</p>
+    </div>
+  } @else {
+    @for (s of secciones(); track s.categoria.id) {
+      <section class="seccion">
+        <h2 class="seccion__title">
+          <span class="seccion__icon">{{ s.categoria.icono }}</span>
+          {{ s.categoria.titulo }}
+        </h2>
+
+        <div class="grid">
+          @for (r of s.reportes; track r.tipo) {
+            <article class="card" (click)="abrirReporte(r.tipo)" tabindex="0"
+                     (keydown.enter)="abrirReporte(r.tipo)">
+              <span class="card__badge"
+                    [class.card__badge--top]="r.badge === 'TOP'"
+                    [class.card__badge--rango]="r.badge === 'RANGO'"
+                    [class.card__badge--detalle]="r.badge === 'DETALLE'">
+                {{ r.badgeLabel }}
+              </span>
+              <span class="card__icon">{{ r.icono }}</span>
+              <h3 class="card__title">{{ r.titulo }}</h3>
+              <p class="card__desc">{{ r.descripcion }}</p>
+              <span class="card__arrow">→</span>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  }
+</section>
