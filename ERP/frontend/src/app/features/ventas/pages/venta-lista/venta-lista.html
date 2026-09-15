@@ -1,0 +1,170 @@
+<app-toast></app-toast>
+
+<div class="ventas-page">
+  <div class="page-header">
+    <div class="page-header__text">
+      <nav class="breadcrumb">
+        <span>Inicio</span>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Ventas</span>
+      </nav>
+      <h1 class="page-header__title">Gestión de Ventas</h1>
+      <p class="page-header__subtitle">{{ subtitulo() }}</p>
+    </div>
+
+    @if (puedeCrear()) {
+      <button type="button" class="btn btn--primary" (click)="nuevaVenta()">
+        + Nueva Venta
+      </button>
+    }
+  </div>
+
+  <div class="filters-bar">
+    <div class="filters-bar__field">
+      <label>Desde</label>
+      <input type="date" [value]="desde()" (change)="onDesdeChange($any($event.target).value)" />
+    </div>
+
+    <div class="filters-bar__field">
+      <label>Hasta</label>
+      <input type="date" [value]="hasta()" (change)="onHastaChange($any($event.target).value)" />
+    </div>
+
+    <select
+      class="filters-bar__select"
+      [value]="clienteFilter() ?? ''"
+      (change)="onClienteChange($any($event.target).value)">
+      <option value="">Todos los clientes</option>
+      @for (cliente of clientes(); track cliente.id) {
+        <option [value]="cliente.id">{{ cliente.nombre }}</option>
+      }
+    </select>
+
+    <select
+      class="filters-bar__select"
+      [value]="estadoFilter()"
+      (change)="onEstadoChange($any($event.target).value)">
+      <option value="todos">Todos los estados</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="COMPLETADA">Completada</option>
+      <option value="CANCELADA">Cancelada</option>
+    </select>
+
+    @if (hasFiltros()) {
+      <button type="button" class="btn btn--ghost" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <div class="table-card">
+    @if (errorCarga(); as mensaje) {
+      <div class="error-state">
+        <div class="error-state__icon">⚠</div>
+        <p class="error-state__title">No se pudieron cargar las ventas</p>
+        <p class="error-state__detail">{{ mensaje }}</p>
+      </div>
+    } @else {
+      @if (loading() || totalVentas() > 0) {
+        <table class="ventas-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th class="col-actions">Acciones</th>
+            </tr>
+          </thead>
+
+          @if (loading()) {
+            <tbody>
+              @for (i of [1, 2, 3, 4, 5]; track i) {
+                <tr class="skeleton-row">
+                  <td><div class="skeleton skeleton--sm"></div></td>
+                  <td><div class="skeleton skeleton--lg"></div></td>
+                  <td><div class="skeleton skeleton--sm"></div></td>
+                  <td><div class="skeleton skeleton--sm"></div></td>
+                  <td><div class="skeleton skeleton--badge"></div></td>
+                  <td class="col-actions"><div class="skeleton skeleton--actions"></div></td>
+                </tr>
+              }
+            </tbody>
+          } @else {
+            <tbody>
+              @for (venta of paginatedVentas(); track venta.id) {
+                <tr>
+                  <td class="venta-numero">{{ venta.numeroVenta }}</td>
+                  <td>{{ venta.clienteNombre }}</td>
+                  <td class="text-muted">{{ formatoFecha(venta.fecha) }}</td>
+                  <td>{{ formatoQuetzales(venta.total) }}</td>
+                  <td>
+                    <span [class]="estadoBadgeClass(venta.estado)">{{ venta.estado }}</span>
+                  </td>
+                  <td class="col-actions">
+                    <div class="acciones">
+                      <button type="button" class="action-btn" (click)="verDetalle(venta)">
+                        Ver detalle
+                      </button>
+
+                      @if (puedeDescargarFactura()) {
+                        <button
+                          type="button"
+                          class="action-btn"
+                          [disabled]="descargandoId() === venta.id"
+                          (click)="descargarFactura(venta)">
+                          {{ descargandoId() === venta.id ? 'Generando...' : 'Factura' }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          }
+        </table>
+      }
+
+      @if (!loading() && totalVentas() === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon">🧾</div>
+          <p class="empty-state__title">No hay ventas que coincidan con los filtros</p>
+          @if (hasFiltros()) {
+            <button type="button" class="btn btn--secondary" (click)="limpiarFiltros()">
+              Limpiar filtros
+            </button>
+          }
+        </div>
+      }
+
+      @if (!loading() && totalVentas() > 0) {
+        <div class="pagination">
+          <span class="pagination__info">
+            Mostrando {{ rangoMostrado().desde }}-{{ rangoMostrado().hasta }} de {{ totalVentas() }} ventas
+          </span>
+
+          <div class="pagination__controls">
+            <button
+              type="button"
+              class="pagination__btn"
+              [disabled]="currentPage() === 1"
+              (click)="irAPagina(currentPage() - 1)">‹</button>
+            @for (pagina of paginasVisibles(); track pagina) {
+              <button
+                type="button"
+                class="pagination__btn"
+                [class.pagination__btn--active]="pagina === currentPage()"
+                (click)="irAPagina(pagina)">{{ pagina }}</button>
+            }
+            <button
+              type="button"
+              class="pagination__btn"
+              [disabled]="currentPage() === totalPages()"
+              (click)="irAPagina(currentPage() + 1)">›</button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>

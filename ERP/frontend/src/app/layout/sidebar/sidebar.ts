@@ -44,7 +44,8 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Productos', icon: 'cube', path: '/productos' },
     { label: 'Ventas', icon: 'chart-bar', path: '/ventas' },
     { label: 'Nueva venta', icon: 'shopping-cart', path: '/ventas/nueva' },
-    { label: 'Historial de ventas', icon: 'clipboard-document-list', path: '/ventas/historial' },
+    // 'Historial de ventas' se eliminó: el listado único de /ventas ya
+    // incluye filtros por fecha y cliente.
   ],
 };
 

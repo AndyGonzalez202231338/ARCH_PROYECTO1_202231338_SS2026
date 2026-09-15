@@ -1,0 +1,211 @@
+$color-primario: #0d3b2e;
+$color-secundario: #1a5f4a;
+$color-fondo: #f5f7fa;
+$color-superficie: #ffffff;
+$color-texto: #1f2937;
+$color-texto-secundario: #6b7280;
+$color-borde: #e5e7eb;
+$color-peligro: #ef4444;
+$color-advertencia: #f59e0b;
+$color-exito: #10b981;
+
+:host {
+  display: block;
+  background: $color-fondo;
+}
+
+.detalle-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.btn-back {
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  color: $color-secundario;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+
+  &:hover { text-decoration: underline; }
+}
+
+.detalle-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  &__numero { font-size: 24px; font-weight: 700; color: $color-texto; margin: 0; }
+  &__fecha { font-size: 13px; color: $color-texto-secundario; margin: 4px 0 0; }
+}
+
+.detalle-card {
+  background: $color-superficie;
+  border: 1px solid $color-borde;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: $color-texto;
+    margin: 0 0 14px;
+  }
+
+  &--loading {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 40px 20px;
+
+  &__icon { font-size: 32px; color: $color-peligro; }
+  &__title { font-size: 15px; font-weight: 600; color: $color-texto; margin: 0; }
+  &__detail { font-size: 13px; color: $color-peligro; margin: 0; }
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+
+  &__item { display: flex; flex-direction: column; gap: 2px; }
+  &__label { font-size: 12px; color: $color-texto-secundario; text-transform: uppercase; letter-spacing: 0.02em; }
+  &__value { font-size: 14px; color: $color-texto; font-weight: 600; word-break: break-word; }
+}
+
+.detalle-table-wrap {
+  overflow-x: auto;
+  border: 1px solid $color-borde;
+  border-radius: 8px;
+}
+
+.detalle-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+
+  thead {
+    background: #f9fafb;
+
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: $color-texto-secundario;
+      padding: 10px 12px;
+    }
+  }
+
+  td {
+    padding: 10px 12px;
+    font-size: 14px;
+    color: $color-texto;
+    border-bottom: 1px solid $color-borde;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  .col-subtotal { font-weight: 600; }
+}
+
+.totales {
+  margin-top: 14px;
+  margin-left: auto;
+  max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: $color-texto-secundario;
+
+    &--total {
+      font-size: 16px;
+      font-weight: 700;
+      color: $color-texto;
+      border-top: 1px solid $color-borde;
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+  }
+}
+
+.detalle-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease, opacity 150ms ease;
+
+  &--primary {
+    background: $color-primario;
+    color: #fff;
+    &:hover:not(:disabled) { background: $color-secundario; }
+    &:disabled { opacity: 0.55; cursor: not-allowed; }
+  }
+
+  &--secondary {
+    background: $color-superficie;
+    border-color: $color-borde;
+    color: $color-texto;
+    &:hover { background: #f9fafb; }
+  }
+}
+
+.badge-estado {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+
+  &--pendiente { background: rgba(245, 158, 11, 0.14); color: $color-advertencia; }
+  &--completada { background: rgba(16, 185, 129, 0.12); color: $color-exito; }
+  &--cancelada { background: rgba(239, 68, 68, 0.12); color: $color-peligro; }
+}
+
+.skeleton {
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eceff1 25%, #f5f7fa 37%, #eceff1 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+
+  &--block { height: 42px; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
