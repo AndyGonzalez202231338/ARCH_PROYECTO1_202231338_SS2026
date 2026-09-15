@@ -81,7 +81,7 @@
       <button class="btn btn--ghost"   type="button" (click)="limpiar()">Limpiar filtros</button>
 
       <button class="btn btn--secondary filters__export" type="button" (click)="exportarCsv()">
-        ⬇ Exportar a CSV
+         Exportar a CSV
       </button>
     </div>
 
@@ -98,7 +98,7 @@
       </div>
     } @else if (sinResultados()) {
       <div class="empty">
-        <span class="empty__icon">📭</span>
+        <span class="empty__icon"></span>
         <p>No hay datos para los filtros seleccionados</p>
       </div>
     } @else {
@@ -344,7 +344,6 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Código</th>
           <th>Producto</th>
           <th>{{ esMonto(tipo()) ? 'Ingresos' : 'Valor' }}</th>
         </tr>
@@ -353,9 +352,8 @@
         @for (p of items; track p.productoId; let i = $index) {
           <tr [class.row--first]="i === 0">
             <td class="pos">
-              @if (i === 0) { <span class="medal"></span> } @else { {{ i + 1 }} }
+              @if (i === 0) { <span class="medal">🥇</span> } @else { {{ i + 1 }} }
             </td>
-            <td class="mono">{{ p.codigo ?? '—' }}</td>
             <td>{{ p.nombre }}</td>
             <td class="mono">
               @if (esMonto(tipo())) {
