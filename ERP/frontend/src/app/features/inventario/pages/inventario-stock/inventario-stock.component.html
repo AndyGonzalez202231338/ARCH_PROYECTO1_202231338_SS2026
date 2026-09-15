@@ -1,0 +1,160 @@
+<!-- src/app/features/inventario/pages/inventario-stock/inventario-stock.component.html -->
+<section class="page">
+  <!-- Encabezado -->
+  <header class="page__head">
+    <div>
+      <nav class="breadcrumb">Inicio / <span>Inventario</span></nav>
+      <h1 class="page__title">Inventario</h1>
+      <p class="page__subtitle">Consulta las existencias actuales de los productos</p>
+    </div>
+    <button type="button" class="btn btn--secondary" (click)="exportarCsv()">
+      ⬇ Exportar a CSV
+    </button>
+  </header>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <article class="kpi">
+      <span class="kpi__label">Total de productos</span>
+      <span class="kpi__value">{{ totalProductos() }}</span>
+    </article>
+    <article class="kpi" [class.kpi--warning]="totalBajoStock() > 0">
+      <span class="kpi__label">Productos con bajo stock</span>
+      <span class="kpi__value">{{ totalBajoStock() }}</span>
+    </article>
+    <article class="kpi" [class.kpi--danger]="totalSinStock() > 0">
+      <span class="kpi__label">Productos sin stock</span>
+      <span class="kpi__value">{{ totalSinStock() }}</span>
+    </article>
+    <article class="kpi">
+      <span class="kpi__label">Valor total del inventario</span>
+      <span class="kpi__value">{{ valorTotal() | currency:'GTQ':'symbol-narrow':'1.2-2' }}</span>
+    </article>
+  </div>
+
+  <!-- Tabs -->
+  <nav class="tabs">
+    <a class="tabs__item tabs__item--active">Stock actual</a>
+    <a class="tabs__item" routerLink="/inventario/alertas">Bajo stock</a>
+  </nav>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <input
+      type="text"
+      class="input"
+      placeholder="Buscar por nombre o código…"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event); onFiltroChange()"
+    />
+
+    <select
+      class="input"
+      [ngModel]="categoriaId()"
+      (ngModelChange)="categoriaId.set($event); onFiltroChange()"
+    >
+      <option [ngValue]="null">Todas las categorías</option>
+      @for (c of categorias(); track c.id) {
+        <option [ngValue]="c.id">{{ c.nombre }}</option>
+      }
+    </select>
+
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        [ngModel]="soloBajoStock()"
+        (ngModelChange)="soloBajoStock.set($event); onFiltroChange()"
+      />
+      Solo bajo stock
+    </label>
+
+    @if (hayFiltros()) {
+      <button type="button" class="btn btn--ghost" (click)="limpiarFiltros()">
+        ✕ Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Stock</th>
+          <th>Mínimo</th>
+          <th>Precio venta</th>
+          <th>Valor inventario</th>
+          <th class="ta-r">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <tr class="skeleton-row">
+              <td colspan="8"><div class="skeleton"></div></td>
+            </tr>
+          }
+        } @else if (paginados().length === 0) {
+          <tr>
+            <td colspan="8">
+              <div class="empty">
+                <span class="empty__icon">📦</span>
+                <p>No hay productos que coincidan con los filtros</p>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (p of paginados(); track p.productoId) {
+            <tr [class]="rowClass(p)">
+              <td class="mono">{{ p.codigo }}</td>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.categoria }}</td>
+              <td>
+                <span [class]="badgeStockClass(p)">
+                  {{ p.stockActual }} · {{ badgeStockTexto(p) }}
+                </span>
+              </td>
+              <td class="mono">{{ p.stockMinimo }}</td>
+              <td class="mono">{{ p.precioVenta | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+              <td class="mono">{{ p.valorInventario | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+              <td class="ta-r">
+                @if (puedeVerMovimientos()) {
+                  <a class="btn btn--primary btn--sm"
+                     [routerLink]="['/inventario/movimientos', p.productoId]">
+                    Ver movimientos
+                  </a>
+                } @else {
+                  <a class="btn btn--secondary btn--sm"
+                     [routerLink]="['/productos', p.productoId]">
+                    Ver producto
+                  </a>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  @if (!loading() && filtrados().length > 0) {
+    <footer class="pagination">
+      <span class="pagination__info">
+        Mostrando {{ paginados().length }} de {{ filtrados().length }} productos
+      </span>
+      <div class="pagination__controls">
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === 1"
+                (click)="irPagina(page() - 1)">‹ Anterior</button>
+        <span class="pagination__page">{{ page() }} / {{ totalPaginas() }}</span>
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === totalPaginas()"
+                (click)="irPagina(page() + 1)">Siguiente ›</button>
+      </div>
+    </footer>
+  }
+</section>

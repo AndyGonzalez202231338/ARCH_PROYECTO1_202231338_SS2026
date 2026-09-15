@@ -128,7 +128,40 @@ export const routes: Routes = [
         path: 'clientes',
         canActivate: [roleGuard],
         data: { permission: 'clientes', title: 'Clientes' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/clientes/pages/cliente-lista/cliente-lista').then(
+                m => m.ClienteLista,
+              ),
+          },
+          {
+            path: 'nuevo',
+            canActivate: [roleGuard],
+            data: { permission: 'clientes', title: 'Nuevo cliente' },
+            loadComponent: () =>
+              import('./features/clientes/pages/cliente-form/cliente-form').then(
+                m => m.ClienteForm,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/clientes/pages/cliente-detalle/cliente-detalle').then(
+                m => m.ClienteDetalle,
+              ),
+          },
+          {
+            path: ':id/editar',
+            canActivate: [roleGuard],
+            data: { permission: 'clientes', title: 'Editar cliente' },
+            loadComponent: () =>
+              import('./features/clientes/pages/cliente-form/cliente-form').then(
+                m => m.ClienteForm,
+              ),
+          },
+        ],
       },
 
       // --- Compras ---
@@ -200,19 +233,25 @@ export const routes: Routes = [
         path: 'inventario',
         canActivate: [roleGuard],
         data: { permission: 'inventario-stock', title: 'Inventario' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'inventario/movimientos',
-        canActivate: [roleGuard],
-        data: { permission: 'inventario-movimientos', title: 'Movimientos de inventario' },
-        loadComponent: placeholder,
+        loadComponent: () =>
+          import('./features/inventario/pages/inventario-stock/inventario-stock.component')
+            .then(m => m.InventarioStockComponent),
       },
       {
         path: 'inventario/alertas',
         canActivate: [roleGuard],
-        data: { permission: 'inventario-ajustes', title: 'Ajustes de inventario' },
-        loadComponent: placeholder,
+        data: { permission: 'inventario-ajustes', title: 'Bajo stock' },
+        loadComponent: () =>
+          import('./features/inventario/pages/inventario-bajo-stock/inventario-bajo-stock.component')
+            .then(m => m.InventarioBajoStockComponent),
+      },
+      {
+        path: 'inventario/movimientos/:productoId',
+        canActivate: [roleGuard],
+        data: { permission: 'inventario-movimientos', title: 'Movimientos' },
+        loadComponent: () =>
+          import('./features/inventario/pages/inventario-movimientos/inventario-movimientos.component')
+            .then(m => m.InventarioMovimientosComponent),
       },
 
       // --- Reportes ---

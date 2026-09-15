@@ -47,18 +47,32 @@ public class ReporteServiceImpl implements ReporteService {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TopProductoResponse> productosMasMovimientos(
-            LocalDateTime desde, LocalDateTime hasta, int top) {
+        @Override
+        @Transactional(readOnly = true)
+        public List<TopProductoResponse> productosMasMovimientos(
+                LocalDateTime desde, LocalDateTime hasta, int top) {
+
         Pageable limit = PageRequest.of(0, top);
-        return movimientoRepository.findProductosConMasMovimientos(desde, hasta, limit)
-                .stream()
+
+        List<Object[]> resultados;
+
+        // Si no hay filtros de fecha, usar el método sin fechas.
+        // Si hay al menos uno, normalizar a un rango válido para evitar nulls.
+        if (desde == null && hasta == null) {
+                resultados = movimientoRepository.findProductosConMasMovimientosSinFechas(limit);
+        } else {
+                LocalDateTime d = desde != null ? desde : LocalDateTime.of(1900, 1, 1, 0, 0);
+                LocalDateTime h = hasta != null ? hasta : LocalDateTime.now().plusYears(100);
+                resultados = movimientoRepository.findProductosConMasMovimientosEnRango(d, h, limit);
+        }
+
+        return resultados.stream()
                 .map(r -> new TopProductoResponse(
-                        (Long) r[0], (String) r[1],
+                        (Long) r[0],
+                        (String) r[1],
                         BigDecimal.valueOf(((Number) r[2]).longValue())))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)

@@ -1,0 +1,160 @@
+@use 'sass:color';
+
+$primary:   #0d3b2e;
+$primary-h: #1a5f4a;
+$bg:        #f5f7fa;
+$surface:   #ffffff;
+$text:      #1f2937;
+$text-sec:  #6b7280;
+$border:    #e5e7eb;
+
+$low-bg: #fef3c7; $low-fg: #92400e;
+$out-bg: #fee2e2; $out-fg: #991b1b;
+
+:host { display: block; }
+
+.page {
+  padding: 24px;
+  background: $bg;
+  min-height: 100%;
+  color: $text;
+}
+
+.page__head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 16px; margin-bottom: 20px;
+}
+.breadcrumb {
+  font-size: 12px; color: $text-sec; margin-bottom: 6px;
+  a { color: $text-sec; text-decoration: none; &:hover { color: $primary; } }
+  span { color: $text; font-weight: 600; }
+}
+.page__title {
+  font-size: 24px; font-weight: 700; color: $text; margin: 0 0 4px;
+  display: flex; align-items: center; gap: 10px;
+}
+.page__subtitle { font-size: 14px; color: $text-sec; margin: 0; }
+
+.count-badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 700;
+  background: $out-bg; color: $out-fg;
+}
+
+/* Filtros */
+.filters {
+  display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+
+  &__label {
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 13px; color: $text-sec; font-weight: 500;
+  }
+}
+.input {
+  border: 1px solid $border;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  background: $surface;
+  color: $text;
+  outline: none;
+  min-width: 200px;
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(13,59,46,.12); }
+}
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 6px; font-size: 14px; font-weight: 500;
+  padding: 9px 14px; cursor: pointer; border: 1px solid transparent;
+  text-decoration: none;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+
+  &--sm { padding: 6px 10px; font-size: 13px; }
+  &--primary { background: $primary; color: #fff; &:hover { background: $primary-h; } }
+  &--secondary {
+    background: $surface; color: $text; border-color: $border;
+    &:hover { background: #f9fafb; }
+  }
+  &--ghost { background: transparent; color: $text-sec; &:hover { color: $text; } }
+
+  &:disabled, &[disabled] {
+    background: #e5e7eb; color: #9ca3af; cursor: not-allowed; border-color: #e5e7eb;
+  }
+}
+
+.tooltip-wrap { display: inline-block; }
+
+/* Tabla */
+.table-wrap {
+  background: $surface; border: 1px solid $border; border-radius: 8px;
+  overflow: hidden; box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+.table {
+  width: 100%; border-collapse: collapse; font-size: 14px;
+  thead th {
+    background: #f9fafb; color: $text-sec;
+    font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+    text-align: left; padding: 12px 16px; font-weight: 600;
+    border-bottom: 1px solid $border;
+  }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid $border;
+    vertical-align: middle;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9fafb; }
+
+  tbody tr.row--warning { background: #fffbeb; }
+  tbody tr.row--warning:hover { background: color.adjust(#fffbeb, $lightness: -3%); }
+  tbody tr.row--danger  { background: #fef2f2; }
+  tbody tr.row--danger:hover  { background: color.adjust(#fef2f2, $lightness: -2%); }
+
+  .ta-r { text-align: right; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+}
+
+.deficit { color: #991b1b; font-weight: 600; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+  &--warning { background: $low-bg; color: $low-fg; }
+  &--danger  { background: $out-bg; color: $out-fg; }
+}
+
+.empty {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 48px 16px; color: $text-sec;
+  &__icon { font-size: 42px; }
+  p { margin: 0; font-size: 14px; }
+}
+
+.skeleton-row td { padding: 16px; }
+.skeleton {
+  height: 14px; border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.pagination {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; margin-top: 16px; flex-wrap: wrap;
+  &__info { font-size: 13px; color: $text-sec; }
+  &__controls { display: flex; align-items: center; gap: 8px; }
+  &__page { font-size: 13px; color: $text; padding: 0 8px; }
+}

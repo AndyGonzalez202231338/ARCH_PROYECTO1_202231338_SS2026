@@ -2,6 +2,7 @@ package com.minierp.backend.repository;
 
 import com.minierp.backend.entity.MovimientoInventario;
 import com.minierp.backend.entity.enums.TipoMovimiento;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -13,18 +14,18 @@ import java.util.List;
 
 public interface MovimientoInventarioRepository extends JpaRepository<MovimientoInventario, Long> {
 
+    // =========================================================
+    // UEPS / PEPS — Lotes disponibles con bloqueo pesimista
+    // =========================================================
+
     /**
      * Obtiene las ENTRADAS de un producto con saldo disponible > 0,
-     * ordenadas según el método UEPS o PEPS.
+     * ordenadas por fecha ASCENDENTE (más antiguas primero).
+     * Se usa para el método PEPS.
      *
-     * Se usa un bloqueo PESSIMISTIC_WRITE para evitar que dos
-     * ventas concurrentes consuman el mismo lote.
-     *
-     * El llamador decide el orden:
-     *   - PEPS: ORDER BY fecha ASC
-     *   - UEPS: ORDER BY fecha DESC
-     *
-     * Como JPQL no permite ORDER BY dinámico, se ofrecen dos métodos.
+     * El bloqueo PESSIMISTIC_WRITE evita que dos ventas concurrentes
+     * consuman el mismo lote y generen stock negativo.
+     * SOLO debe usarse dentro de una transacción (@Transactional).
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT m FROM MovimientoInventario m " +
@@ -34,6 +35,11 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
            "ORDER BY m.fecha ASC, m.id ASC")
     List<MovimientoInventario> findLotesDisponiblesPEPS(@Param("productoId") Long productoId);
 
+    /**
+     * Obtiene las ENTRADAS de un producto con saldo disponible > 0,
+     * ordenadas por fecha DESCENDENTE (más recientes primero).
+     * Se usa para el método UEPS.
+     */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT m FROM MovimientoInventario m " +
            "WHERE m.producto.id = :productoId " +
@@ -42,9 +48,14 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
            "ORDER BY m.fecha DESC, m.id DESC")
     List<MovimientoInventario> findLotesDisponiblesUEPS(@Param("productoId") Long productoId);
 
+    // =========================================================
+    // Stock actual (suma de saldos disponibles)
+    // =========================================================
+
     /**
-     * Stock actual de un producto (suma de saldos disponibles
-     * de todas las entradas).
+     * Stock actual de un producto: suma de saldos disponibles
+     * de todas las entradas.
+     * Devuelve 0 si no hay entradas (COALESCE evita null).
      */
     @Query("SELECT COALESCE(SUM(m.saldoDisponible), 0) " +
            "FROM MovimientoInventario m " +
@@ -53,47 +64,98 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
     Integer sumSaldoDisponibleByProducto(@Param("productoId") Long productoId);
 
     /**
-     * Historial de movimientos de un producto con filtros de fecha.
+     * Historial COMPLETO de un producto (sin filtros de fecha).
+     * Se usa cuando el frontend no envía ni desde ni hasta.
+     * Incluye JOIN FETCH a usuario y producto para que el service
+     * pueda acceder a sus campos sin LazyInitializationException.
      */
     @Query("SELECT m FROM MovimientoInventario m " +
-           "JOIN FETCH m.usuario u " +
+           "JOIN FETCH m.usuario " +
+           "JOIN FETCH m.producto " +
            "WHERE m.producto.id = :productoId " +
-           "AND (:fechaDesde IS NULL OR m.fecha >= :fechaDesde) " +
-           "AND (:fechaHasta IS NULL OR m.fecha <= :fechaHasta) " +
            "ORDER BY m.fecha DESC")
-    List<MovimientoInventario> findHistorialByProducto(@Param("productoId") Long productoId,
-                                                       @Param("fechaDesde") LocalDateTime fechaDesde,
-                                                       @Param("fechaHasta") LocalDateTime fechaHasta);
+    List<MovimientoInventario> findHistorialByProducto(@Param("productoId") Long productoId);
 
     /**
-     * Top N productos con mayor cantidad de movimientos.
-     * Para el reporte "Productos con mayor cantidad de movimientos".
+     * Historial de un producto CON filtro de fechas.
+     * Se usa cuando el frontend envía desde y/o hasta.
+     * NUNCA recibe null: el service normaliza a valores por
+     * defecto (1900-01-01 y hoy + 100 años) antes de llamar.
+     *
+     * Esto evita el error de PostgreSQL "could not determine
+     * data type of parameter" que ocurre con parámetros null.
+     */
+    @Query("SELECT m FROM MovimientoInventario m " +
+           "JOIN FETCH m.usuario " +
+           "JOIN FETCH m.producto " +
+           "WHERE m.producto.id = :productoId " +
+           "AND m.fecha >= :fechaDesde " +
+           "AND m.fecha <= :fechaHasta " +
+           "ORDER BY m.fecha DESC")
+    List<MovimientoInventario> findHistorialByProductoEnRango(
+            @Param("productoId") Long productoId,
+            @Param("fechaDesde") LocalDateTime fechaDesde,
+            @Param("fechaHasta") LocalDateTime fechaHasta);
+
+
+    /**
+     * Top N productos con mayor cantidad de movimientos (sin rango de fechas).
+     * Se usa cuando el reporte no filtra por fechas.
      */
     @Query("SELECT m.producto.id, m.producto.nombre, COUNT(m) " +
            "FROM MovimientoInventario m " +
-           "WHERE (:fechaDesde IS NULL OR m.fecha >= :fechaDesde) " +
-           "AND (:fechaHasta IS NULL OR m.fecha <= :fechaHasta) " +
            "GROUP BY m.producto.id, m.producto.nombre " +
            "ORDER BY COUNT(m) DESC")
-    List<Object[]> findProductosConMasMovimientos(@Param("fechaDesde") LocalDateTime fechaDesde,
-                                                  @Param("fechaHasta") LocalDateTime fechaHasta,
-                                                  org.springframework.data.domain.Pageable pageable);
+    List<Object[]> findProductosConMasMovimientosSinFechas(Pageable pageable);
 
     /**
-     * Movimientos por referencia (para auditar y eliminar en cascada
-     * si se cancela una compra/venta).
+     * Top N productos con mayor cantidad de movimientos CON rango de fechas.
+     * NUNCA recibe null: el service normaliza antes de llamar.
      */
-    List<MovimientoInventario> findByReferenciaTipoAndReferenciaId(String referenciaTipo, Long referenciaId);
+    @Query("SELECT m.producto.id, m.producto.nombre, COUNT(m) " +
+           "FROM MovimientoInventario m " +
+           "WHERE m.fecha >= :fechaDesde " +
+           "AND m.fecha <= :fechaHasta " +
+           "GROUP BY m.producto.id, m.producto.nombre " +
+           "ORDER BY COUNT(m) DESC")
+    List<Object[]> findProductosConMasMovimientosEnRango(
+            @Param("fechaDesde") LocalDateTime fechaDesde,
+            @Param("fechaHasta") LocalDateTime fechaHasta,
+            Pageable pageable);
+
+    // =========================================================
+    // Movimientos por tipo y por referencia
+    // =========================================================
 
     /**
-     * Movimientos de un tipo específico en un rango de fechas.
+     * Movimientos de un tipo específico SIN rango de fechas.
      */
     @Query("SELECT m FROM MovimientoInventario m " +
+           "JOIN FETCH m.producto " +
            "WHERE m.tipoMovimiento = :tipo " +
-           "AND (:fechaDesde IS NULL OR m.fecha >= :fechaDesde) " +
-           "AND (:fechaHasta IS NULL OR m.fecha <= :fechaHasta) " +
            "ORDER BY m.fecha DESC")
-    List<MovimientoInventario> findByTipoAndRango(@Param("tipo") TipoMovimiento tipo,
-                                                  @Param("fechaDesde") LocalDateTime fechaDesde,
-                                                  @Param("fechaHasta") LocalDateTime fechaHasta);
+    List<MovimientoInventario> findByTipo(@Param("tipo") TipoMovimiento tipo);
+
+    /**
+     * Movimientos de un tipo específico CON rango de fechas.
+     * NUNCA recibe null: el service normaliza antes de llamar.
+     */
+    @Query("SELECT m FROM MovimientoInventario m " +
+           "JOIN FETCH m.producto " +
+           "WHERE m.tipoMovimiento = :tipo " +
+           "AND m.fecha >= :fechaDesde " +
+           "AND m.fecha <= :fechaHasta " +
+           "ORDER BY m.fecha DESC")
+    List<MovimientoInventario> findByTipoEnRango(
+            @Param("tipo") TipoMovimiento tipo,
+            @Param("fechaDesde") LocalDateTime fechaDesde,
+            @Param("fechaHasta") LocalDateTime fechaHasta);
+
+    /**
+     * Movimientos asociados a una compra o venta específica.
+     * Se usa para auditar y para revertir movimientos si se cancela
+     * una compra o venta.
+     */
+    List<MovimientoInventario> findByReferenciaTipoAndReferenciaId(
+            String referenciaTipo, Long referenciaId);
 }
