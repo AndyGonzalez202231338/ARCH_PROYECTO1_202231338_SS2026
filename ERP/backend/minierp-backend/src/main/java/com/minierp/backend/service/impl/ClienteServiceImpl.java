@@ -29,7 +29,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> listar(Boolean activo, String texto) {
-        return clienteRepository.filtrar(activo, texto).stream()
+        String textoNorm = (texto == null || texto.isBlank()) ? "" : texto.trim();
+        return clienteRepository.filtrar(activo, textoNorm).stream()
                 .map(this::toResponse)
                 .toList();
     }

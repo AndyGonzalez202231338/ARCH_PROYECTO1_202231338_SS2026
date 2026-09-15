@@ -168,19 +168,31 @@ export const routes: Routes = [
         path: 'ventas',
         canActivate: [roleGuard],
         data: { permission: 'ventas-consultar', title: 'Ventas' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'ventas/nueva',
-        canActivate: [roleGuard],
-        data: { permission: 'ventas-registrar', title: 'Nueva venta' },
-        loadComponent: placeholder,
-      },
-      {
-        path: 'ventas/historial',
-        canActivate: [roleGuard],
-        data: { permission: 'ventas-consultar', title: 'Historial de ventas' },
-        loadComponent: placeholder,
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/ventas/pages/venta-lista/venta-lista').then(
+                m => m.VentaLista,
+              ),
+          },
+          {
+            path: 'nueva',
+            canActivate: [roleGuard],
+            data: { permission: 'ventas-registrar', title: 'Nueva venta' },
+            loadComponent: () =>
+              import('./features/ventas/pages/venta-form/venta-form').then(
+                m => m.VentaForm,
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/ventas/pages/venta-detalle/venta-detalle').then(
+                m => m.VentaDetalle,
+              ),
+          },
+        ],
       },
 
       // --- Inventario ---

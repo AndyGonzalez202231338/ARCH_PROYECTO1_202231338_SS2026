@@ -1,0 +1,184 @@
+<app-toast></app-toast>
+
+<div class="form-page">
+  <div class="form-page__header">
+    <nav class="breadcrumb">
+      <span>Inicio</span>
+      <span class="breadcrumb__sep">/</span>
+      <a routerLink="/ventas">Ventas</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">Nueva Venta</span>
+    </nav>
+
+    <button type="button" class="btn-back" (click)="cancelar()">← Volver</button>
+    <h1 class="form-page__title">Nueva Venta</h1>
+  </div>
+
+  <div class="form-card">
+    <div class="aviso">
+      <span class="aviso__icon">ℹ</span>
+      <p class="aviso__texto">
+        Al guardar la venta, el inventario se actualizará automáticamente aplicando el
+        método de valoración según el usuario que registra (UEPS/PEPS).
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="form-row">
+        <div class="field">
+          <label class="field__label">Cliente <span class="field__required">*</span></label>
+          <select class="field__input" formControlName="clienteId">
+            <option [ngValue]="null" disabled>Selecciona un cliente</option>
+            @for (cliente of clientes(); track cliente.id) {
+              <option [ngValue]="cliente.id">{{ cliente.nombre }}</option>
+            }
+          </select>
+          @if (campoInvalido('clienteId')) {
+            <p class="field__error">Selecciona un cliente.</p>
+          }
+          @if (clienteSeleccionado; as cliente) {
+            <p class="field__hint">
+              {{ cliente.tipoDocumento }}: {{ cliente.numeroDocumento }} · Tel: {{ cliente.telefono }}
+            </p>
+          }
+        </div>
+      </div>
+
+      <h2 class="form-card__section-title">Productos de la venta</h2>
+
+      <div class="detalle-table-wrap">
+        <table class="detalle-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Stock disp.</th>
+              <th>Precio unitario</th>
+              <th>Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody formArrayName="detalles">
+            @for (grupo of detalles.controls; track grupo; let i = $index) {
+              <tr [formGroupName]="i">
+                <td class="col-producto">
+                  <input
+                    type="text"
+                    class="field__input field__input--search"
+                    placeholder="Buscar por código o nombre..."
+                    [value]="filtrosProducto()[i]"
+                    (input)="onFiltroProductoChange(i, $any($event.target).value)" />
+                  <select
+                    class="field__input"
+                    [value]="grupo.get('productoId')?.value ?? ''"
+                    (change)="onProductoSeleccionado(i, $any($event.target).value)">
+                    <option value="" disabled>Selecciona un producto</option>
+                    @for (producto of productosFiltrados(i); track producto.id) {
+                      <option [value]="producto.id">
+                        {{ producto.codigo }} — {{ producto.nombre }}
+                      </option>
+                    }
+                  </select>
+                  @if (detalleInvalido(i, 'productoId')) {
+                    <p class="field__error">Selecciona un producto.</p>
+                  }
+                </td>
+
+                <td class="col-cantidad">
+                  <input
+                    type="number"
+                    class="field__input"
+                    [class.field__input--error]="stockInsuficienteEn(i)"
+                    min="1"
+                    formControlName="cantidad" />
+                  @if (detalleInvalido(i, 'cantidad')) {
+                    <p class="field__error">Mínimo 1.</p>
+                  }
+                  @if (stockInsuficienteEn(i)) {
+                    <p class="field__error">
+                      Stock insuficiente. Disponible: {{ stockDisponibleDe(i) }}
+                    </p>
+                  }
+                </td>
+
+                <td class="col-stock">
+                  @if (stockDisponibleDe(i) === null) {
+                    <span class="text-muted">—</span>
+                  } @else {
+                    <span
+                      class="badge-stock"
+                      [class.badge-stock--error]="stockInsuficienteEn(i)">
+                      {{ stockDisponibleDe(i) }}
+                    </span>
+                  }
+                </td>
+
+                <td class="col-precio">
+                  <input
+                    type="number"
+                    class="field__input"
+                    min="0"
+                    step="0.01"
+                    formControlName="precioUnitario" />
+                  @if (detalleInvalido(i, 'precioUnitario')) {
+                    <p class="field__error">Debe ser ≥ 0.</p>
+                  }
+                </td>
+
+                <td class="col-subtotal">{{ formatoQuetzales(subtotalDe(i)) }}</td>
+
+                <td class="col-quitar">
+                  <button
+                    type="button"
+                    class="action-btn action-btn--danger"
+                    [disabled]="detalles.length === 1"
+                    (click)="quitarProducto(i)">
+                    Quitar
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn btn--secondary" (click)="agregarProducto()">
+        + Agregar producto
+      </button>
+
+      <div class="totales">
+        <div class="totales__row">
+          <span>Subtotal</span>
+          <span>{{ formatoQuetzales(totales().subtotal) }}</span>
+        </div>
+        <div class="totales__row">
+          <span>IVA (19%)</span>
+          <span>{{ formatoQuetzales(totales().iva) }}</span>
+        </div>
+        <div class="totales__row totales__row--total">
+          <span>TOTAL</span>
+          <span>{{ formatoQuetzales(totales().total) }}</span>
+        </div>
+      </div>
+
+      <div class="form-card__actions">
+        <button type="button" class="btn btn--secondary" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="btn btn--primary" [disabled]="guardarDeshabilitado()">
+          {{ guardando() ? 'Guardando...' : 'Guardar Venta' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if (conflictoMensaje(); as mensaje) {
+  <div class="modal-overlay" (click)="cerrarConflicto()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h2 class="modal__title">No se pudo registrar la venta</h2>
+      <p class="modal__mensaje">{{ mensaje }}</p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--primary" (click)="cerrarConflicto()">Entendido</button>
+      </div>
+    </div>
+  </div>
+}

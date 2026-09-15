@@ -1,0 +1,128 @@
+<app-toast></app-toast>
+
+<div class="detalle-page">
+  <button type="button" class="btn-back" (click)="volver()">← Volver al listado</button>
+
+  @if (cargando()) {
+    <div class="detalle-card detalle-card--loading">
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+    </div>
+  } @else if (errorCarga(); as mensaje) {
+    <div class="detalle-card error-state">
+      <div class="error-state__icon">⚠</div>
+      <p class="error-state__title">No se pudo cargar la venta</p>
+      <p class="error-state__detail">{{ mensaje }}</p>
+    </div>
+  } @else if (venta(); as v) {
+    <div class="detalle-header">
+      <div>
+        <h1 class="detalle-header__numero">{{ v.numeroVenta }}</h1>
+        <p class="detalle-header__fecha">Registrada el {{ formatoFecha(v.fecha) }}</p>
+      </div>
+      <span [class]="estadoBadgeClass()">{{ v.estado }}</span>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Cliente</h2>
+      <div class="info-grid">
+        <div class="info-grid__item">
+          <span class="info-grid__label">Nombre</span>
+          <span class="info-grid__value">{{ v.clienteNombre }}</span>
+        </div>
+        @if (cliente(); as c) {
+          <div class="info-grid__item">
+            <span class="info-grid__label">Tipo documento</span>
+            <span class="info-grid__value">{{ c.tipoDocumento }}</span>
+          </div>
+          <div class="info-grid__item">
+            <span class="info-grid__label">Número documento</span>
+            <span class="info-grid__value">{{ c.numeroDocumento }}</span>
+          </div>
+          <div class="info-grid__item">
+            <span class="info-grid__label">Teléfono</span>
+            <span class="info-grid__value">{{ c.telefono || '—' }}</span>
+          </div>
+          <div class="info-grid__item">
+            <span class="info-grid__label">Email</span>
+            <span class="info-grid__value">{{ c.email || '—' }}</span>
+          </div>
+          <div class="info-grid__item">
+            <span class="info-grid__label">Dirección</span>
+            <span class="info-grid__value">{{ c.direccion || '—' }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Productos</h2>
+      <div class="detalle-table-wrap">
+        <table class="detalle-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (detalle of v.detalles; track detalle.id) {
+              <tr>
+                <td>{{ detalle.productoCodigo }}</td>
+                <td>{{ detalle.productoNombre }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>{{ formatoQuetzales(detalle.precioUnitario) }}</td>
+                <td class="col-subtotal">{{ formatoQuetzales(detalle.subtotal) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totales">
+        <div class="totales__row">
+          <span>Subtotal</span>
+          <span>{{ formatoQuetzales(v.subtotal) }}</span>
+        </div>
+        <div class="totales__row">
+          <span>IVA</span>
+          <span>{{ formatoQuetzales(v.impuesto) }}</span>
+        </div>
+        <div class="totales__row totales__row--total">
+          <span>TOTAL</span>
+          <span>{{ formatoQuetzales(v.total) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Información de la venta</h2>
+      <div class="info-grid">
+        <div class="info-grid__item">
+          <span class="info-grid__label">Registrada por</span>
+          <span class="info-grid__value">{{ v.usuarioNombre }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Estado actual</span>
+          <span class="info-grid__value">{{ v.estado }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if (puedeDescargarFactura()) {
+      <div class="detalle-acciones">
+        <button
+          type="button"
+          class="btn btn--primary"
+          [disabled]="descargando()"
+          (click)="descargarFactura()">
+          {{ descargando() ? 'Generando factura...' : '📄 Descargar factura PDF' }}
+        </button>
+      </div>
+    }
+  }
+</div>

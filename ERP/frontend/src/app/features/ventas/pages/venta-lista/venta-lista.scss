@@ -1,0 +1,287 @@
+$color-primario: #0d3b2e;
+$color-secundario: #1a5f4a;
+$color-fondo: #f5f7fa;
+$color-superficie: #ffffff;
+$color-texto: #1f2937;
+$color-texto-secundario: #6b7280;
+$color-borde: #e5e7eb;
+$color-peligro: #ef4444;
+$color-advertencia: #f59e0b;
+$color-exito: #10b981;
+
+:host {
+  display: block;
+  background: $color-fondo;
+}
+
+.ventas-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: $color-texto-secundario;
+  margin-bottom: 8px;
+
+  &__sep { margin: 0 6px; }
+  &__current { color: $color-texto; font-weight: 500; }
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+
+  &__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: $color-texto;
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: 14px;
+    color: $color-texto-secundario;
+    margin: 4px 0 0;
+  }
+}
+
+.filters-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: $color-superficie;
+  border: 1px solid $color-borde;
+  border-radius: 8px;
+  padding: 12px;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      font-size: 12px;
+      color: $color-texto-secundario;
+      font-weight: 600;
+    }
+
+    input {
+      border: 1px solid $color-borde;
+      border-radius: 6px;
+      padding: 9px 10px;
+      font-size: 14px;
+      color: $color-texto;
+
+      &:focus {
+        outline: none;
+        border-color: $color-primario;
+        box-shadow: 0 0 0 3px rgba(13, 59, 46, 0.12);
+      }
+    }
+  }
+
+  &__select {
+    border: 1px solid $color-borde;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: $color-texto;
+    background: $color-superficie;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primario;
+      box-shadow: 0 0 0 3px rgba(13, 59, 46, 0.12);
+    }
+  }
+}
+
+.btn {
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+
+  &--primary {
+    background: $color-primario;
+    color: #fff;
+    &:hover { background: $color-secundario; }
+  }
+
+  &--secondary {
+    background: $color-superficie;
+    border-color: $color-borde;
+    color: $color-texto;
+    &:hover { background: #f9fafb; }
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: $color-borde;
+    color: $color-texto-secundario;
+    &:hover { background: #f9fafb; }
+  }
+}
+
+.table-card {
+  background: $color-superficie;
+  border: 1px solid $color-borde;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.ventas-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: #f9fafb;
+
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: $color-texto-secundario;
+      padding: 12px 16px;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid $color-borde;
+    transition: background-color 150ms ease;
+
+    &:hover { background: #f9fafb; }
+    &:last-child { border-bottom: none; }
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: $color-texto;
+    vertical-align: middle;
+  }
+
+  .col-actions { text-align: right; }
+}
+
+.venta-numero { font-weight: 600; }
+.text-muted { color: $color-texto-secundario; }
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.action-btn {
+  background: $color-superficie;
+  border: 1px solid $color-borde;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: $color-texto;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease;
+
+  &:hover:not(:disabled) { background: #f9fafb; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.badge-estado {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &--pendiente { background: rgba(245, 158, 11, 0.14); color: $color-advertencia; }
+  &--completada { background: rgba(16, 185, 129, 0.12); color: $color-exito; }
+  &--cancelada { background: rgba(239, 68, 68, 0.12); color: $color-peligro; }
+}
+
+.skeleton {
+  border-radius: 4px;
+  background: linear-gradient(90deg, #eceff1 25%, #f5f7fa 37%, #eceff1 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+
+  &--lg { width: 140px; height: 12px; }
+  &--sm { width: 90px; height: 12px; }
+  &--badge { width: 70px; height: 20px; border-radius: 12px; }
+  &--actions { width: 120px; height: 20px; margin-left: auto; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.empty-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 56px 16px;
+  text-align: center;
+
+  &__icon { font-size: 36px; opacity: 0.6; }
+  &__title { font-size: 14px; color: $color-texto-secundario; margin: 0; }
+}
+
+.error-state {
+  &__icon { color: $color-peligro; opacity: 1; }
+  &__title { color: $color-texto; font-weight: 600; }
+  &__detail { font-size: 13px; color: $color-peligro; margin: 0; max-width: 480px; }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 14px 16px;
+  flex-wrap: wrap;
+
+  &__info { font-size: 13px; color: $color-texto-secundario; }
+
+  &__controls { display: flex; gap: 4px; }
+
+  &__btn {
+    min-width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid $color-borde;
+    background: $color-superficie;
+    color: $color-texto;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 150ms ease, opacity 150ms ease;
+
+    &:hover:not(:disabled) { background: #f9fafb; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    &--active {
+      background: $color-primario;
+      border-color: $color-primario;
+      color: #fff;
+    }
+  }
+}

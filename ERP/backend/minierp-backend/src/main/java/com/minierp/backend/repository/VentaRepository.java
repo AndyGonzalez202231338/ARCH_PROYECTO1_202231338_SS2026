@@ -32,15 +32,15 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
      * Filtro por rango de fechas, cliente y estado.
      */
     @Query("SELECT v FROM Venta v JOIN FETCH v.cliente " +
-           "WHERE (:fechaDesde IS NULL OR v.fecha >= :fechaDesde) " +
-           "AND (:fechaHasta IS NULL OR v.fecha <= :fechaHasta) " +
-           "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
-           "AND (:estado IS NULL OR v.estado = :estado) " +
-           "ORDER BY v.fecha DESC")
-    List<Venta> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
-                        @Param("fechaHasta") LocalDateTime fechaHasta,
-                        @Param("clienteId") Long clienteId,
-                        @Param("estado") EstadoVenta estado);
+              "WHERE (CAST(:fechaDesde AS timestamp) IS NULL OR v.fecha >= :fechaDesde) " +
+              "AND (CAST(:fechaHasta AS timestamp) IS NULL OR v.fecha <= :fechaHasta) " +
+              "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
+              "AND (CAST(:estado AS string) IS NULL OR v.estado = :estado) " +
+              "ORDER BY v.fecha DESC")
+       List<Venta> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
+                     @Param("fechaHasta") LocalDateTime fechaHasta,
+                     @Param("clienteId") Long clienteId,
+                     @Param("estado") EstadoVenta estado);
 
     /**
      * Top N clientes con mayor monto acumulado de compras (ventas).
