@@ -220,7 +220,7 @@ public class InventarioServiceImpl implements InventarioService {
     @Transactional(readOnly = true)
     public List<MovimientoInventarioResponse> historialDeProducto(Long productoId) {
         return movimientoRepository
-                .findHistorialByProducto(productoId, null, null)
+                .findHistorialByProducto(productoId)
                 .stream()
                 .map(this::toResponse)
                 .toList();

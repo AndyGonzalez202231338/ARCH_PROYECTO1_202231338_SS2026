@@ -1,0 +1,115 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <nav class="breadcrumb">Inicio / <a routerLink="/inventario">Inventario</a> / <span>Bajo stock</span></nav>
+      <h1 class="page__title">
+        Productos con bajo stock
+        <span class="count-badge">{{ items().length }}</span>
+      </h1>
+      <p class="page__subtitle">Productos que requieren reabastecimiento</p>
+    </div>
+  </header>
+
+  <!-- Filtro umbral -->
+  <div class="filters">
+    <label class="filters__label">
+      Umbral
+      <input
+        type="number"
+        class="input"
+        min="0"
+        placeholder="Usar stock mínimo"
+        [ngModel]="umbralInput()"
+        (ngModelChange)="umbralInput.set($event === '' ? null : +$event)"
+      />
+    </label>
+    <button type="button" class="btn btn--primary" (click)="aplicarUmbral()">
+      Aplicar umbral
+    </button>
+    @if (umbral() != null) {
+      <button type="button" class="btn btn--ghost" (click)="limpiarUmbral()">
+        ✕ Limpiar
+      </button>
+    }
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Stock</th>
+          <th>Mínimo</th>
+          <th>Déficit</th>
+          <th class="ta-r">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          @for (_ of [1,2,3,4,5]; track $index) {
+            <tr class="skeleton-row">
+              <td colspan="7"><div class="skeleton"></div></td>
+            </tr>
+          }
+        } @else if (paginados().length === 0) {
+          <tr>
+            <td colspan="7">
+              <div class="empty">
+                <span class="empty__icon"></span>
+                <p>¡Todo en orden! No hay productos bajo stock.</p>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (p of paginados(); track p.productoId) {
+            <tr [class.row--danger]="p.stockActual === 0" [class.row--warning]="p.stockActual > 0">
+              <td class="mono">{{ p.codigo }}</td>
+              <td>{{ p.nombre }}</td>
+              <td>{{ p.categoria }}</td>
+              <td>
+                <span class="badge"
+                      [class.badge--danger]="p.stockActual === 0"
+                      [class.badge--warning]="p.stockActual > 0">
+                  {{ p.stockActual }}
+                </span>
+              </td>
+              <td class="mono">{{ p.stockMinimo }}</td>
+              <td class="deficit">-{{ deficit(p) }}</td>
+              <td class="ta-r">
+                @if (esCompras()) {
+                  <button type="button" class="btn btn--primary btn--sm" (click)="irACompras()">
+                    → Ir a compras
+                  </button>
+                } @else if (esInventario()) {
+                  <span class="tooltip-wrap" title="Próximamente">
+                    <button type="button" class="btn btn--sm" disabled>→ Ajustar</button>
+                  </span>
+                }
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (!loading() && items().length > 0) {
+    <footer class="pagination">
+      <span class="pagination__info">
+        Mostrando {{ paginados().length }} de {{ items().length }}
+      </span>
+      <div class="pagination__controls">
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === 1"
+                (click)="irPagina(page() - 1)">‹ Anterior</button>
+        <span class="pagination__page">{{ page() }} / {{ totalPaginas() }}</span>
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === totalPaginas()"
+                (click)="irPagina(page() + 1)">Siguiente ›</button>
+      </div>
+    </footer>
+  }
+</section>

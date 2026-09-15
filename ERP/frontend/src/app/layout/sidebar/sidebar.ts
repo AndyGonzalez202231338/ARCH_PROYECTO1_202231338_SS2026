@@ -35,7 +35,7 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Dashboard', icon: 'home', path: '/dashboard' },
     { label: 'Productos', icon: 'cube', path: '/productos' },
     { label: 'Inventario', icon: 'archive-box', path: '/inventario' },
-    { label: 'Movimientos', icon: 'arrow-path', path: '/inventario/movimientos' },
+    //{ label: 'Movimientos', icon: 'arrow-path', path: '/inventario/movimientos' },
     { label: 'Alertas de existencias', icon: 'exclamation-triangle', path: '/inventario/alertas' },
   ],
   VENTAS: [

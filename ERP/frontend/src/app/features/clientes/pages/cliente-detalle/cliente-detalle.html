@@ -1,0 +1,125 @@
+<app-toast></app-toast>
+
+<div class="detalle-page">
+  <button type="button" class="btn-back" (click)="volver()">← Volver al listado</button>
+
+  @if (cargando()) {
+    <div class="detalle-card detalle-card--loading">
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+    </div>
+  } @else if (errorCarga(); as mensaje) {
+    <div class="detalle-card error-state">
+      <div class="error-state__icon">⚠</div>
+      <p class="error-state__title">No se pudo cargar el cliente</p>
+      <p class="error-state__detail">{{ mensaje }}</p>
+    </div>
+  } @else if (cliente(); as c) {
+    <div class="detalle-header">
+      <div>
+        <h1 class="detalle-header__nombre">{{ c.nombre }}</h1>
+        <p class="detalle-header__doc">{{ c.tipoDocumento }} {{ c.numeroDocumento }}</p>
+      </div>
+      <span [class]="estadoBadgeClass()">{{ c.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Información del cliente</h2>
+      <div class="info-grid">
+        <div class="info-grid__item">
+          <span class="info-grid__label">Nombre / Razón social</span>
+          <span class="info-grid__value">{{ c.nombre }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Tipo documento</span>
+          <span class="info-grid__value">{{ c.tipoDocumento }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Número documento</span>
+          <span class="info-grid__value">{{ c.numeroDocumento }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Teléfono</span>
+          <span class="info-grid__value">{{ c.telefono || '—' }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Email</span>
+          <span class="info-grid__value">{{ c.email || '—' }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Dirección</span>
+          <span class="info-grid__value">{{ c.direccion || '—' }}</span>
+        </div>
+        <div class="info-grid__item">
+          <span class="info-grid__label">Estado</span>
+          <span class="info-grid__value">{{ c.activo ? 'Activo' : 'Inactivo' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detalle-card">
+      <h2 class="detalle-card__title">Últimas ventas del cliente</h2>
+
+      @if (cargandoVentas()) {
+        <div class="skeleton skeleton--block"></div>
+      } @else if (ventas().length === 0) {
+        <p class="sin-datos">Sin ventas registradas</p>
+      } @else {
+        <div class="detalle-table-wrap">
+          <table class="detalle-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Número</th>
+                <th>Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (venta of ventas(); track venta.id) {
+                <tr>
+                  <td class="text-muted">{{ formatoFecha(venta.fecha) }}</td>
+                  <td class="venta-numero">{{ venta.numeroVenta }}</td>
+                  <td>{{ formatoQuetzales(venta.total) }}</td>
+                  <td class="col-accion">
+                    <button type="button" class="action-btn" (click)="verVenta(venta)">Ver</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    @if (puedeEditar() || puedeActivar()) {
+      <div class="detalle-acciones">
+        @if (puedeEditar()) {
+          <button type="button" class="btn btn--primary" (click)="editar()">Editar cliente</button>
+        }
+        @if (puedeActivar()) {
+          <button
+            type="button"
+            class="btn"
+            [class.btn--danger]="c.activo"
+            [class.btn--success]="!c.activo"
+            [disabled]="procesandoAccion()"
+            (click)="abrirCambioEstado()">
+            {{ c.activo ? 'Desactivar cliente' : 'Activar cliente' }}
+          </button>
+        }
+      </div>
+    }
+  }
+</div>
+
+<app-confirm-dialog
+  [open]="confirmarAbierto()"
+  [titulo]="tituloConfirmacion()"
+  [mensaje]="mensajeConfirmacion()"
+  [variante]="cliente()?.activo ? 'danger' : 'success'"
+  [textoConfirmar]="cliente()?.activo ? 'Desactivar' : 'Activar'"
+  (confirmar)="confirmarCambioEstado()"
+  (cancelar)="cerrarCambioEstado()">
+</app-confirm-dialog>

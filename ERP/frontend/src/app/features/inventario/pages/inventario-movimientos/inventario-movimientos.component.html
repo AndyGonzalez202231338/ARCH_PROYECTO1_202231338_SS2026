@@ -1,0 +1,136 @@
+<section class="page">
+  <header class="page__head">
+    <div>
+      <button type="button" class="btn btn--secondary btn--sm" routerLink="/inventario">
+        ← Volver al inventario
+      </button>
+      <nav class="breadcrumb">
+        Inicio / <a routerLink="/inventario">Inventario</a> / <span>Movimientos</span>
+      </nav>
+      <h1 class="page__title">Historial de movimientos</h1>
+      <p class="page__subtitle">
+        @if (producto()) {
+          {{ producto()!.codigo }} · {{ producto()!.nombre }}
+        } @else {
+          Cargando producto…
+        }
+      </p>
+    </div>
+  </header>
+
+  <!-- Resumen producto -->
+  <div class="summary">
+    <article class="summary__card">
+      <span class="summary__label">Stock actual</span>
+      <span class="summary__value">{{ producto()?.stockActual ?? '—' }}</span>
+    </article>
+    <article class="summary__card">
+      <span class="summary__label">Stock mínimo</span>
+      <span class="summary__value">{{ producto()?.stockMinimo ?? '—' }}</span>
+    </article>
+    <article class="summary__card">
+      <span class="summary__label">Total de movimientos</span>
+      <span class="summary__value">{{ totalMovimientos() }}</span>
+    </article>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <label class="filters__label">
+      Desde
+      <input type="date" class="input" [ngModel]="desde()" (ngModelChange)="desde.set($event)" />
+    </label>
+    <label class="filters__label">
+      Hasta
+      <input type="date" class="input" [ngModel]="hasta()" (ngModelChange)="hasta.set($event)" />
+    </label>
+    <label class="filters__label">
+      Tipo
+      <select class="input" [ngModel]="tipo()" (ngModelChange)="tipo.set($event)">
+        <option value="">Todos</option>
+        <option value="ENTRADA">Entradas</option>
+        <option value="SALIDA">Salidas</option>
+      </select>
+    </label>
+    <button class="btn btn--primary" type="button" (click)="aplicarFiltros()">Aplicar filtros</button>
+    <button class="btn btn--ghost" type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Tipo</th>
+          <th>Cantidad</th>
+          <th>Costo Unit.</th>
+          <th>Saldo</th>
+          <th>Referencia</th>
+          <th>Usuario</th>
+          <th>Stock final</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          @for (_ of [1,2,3,4,5,6,7,8]; track $index) {
+            <tr class="skeleton-row">
+              <td colspan="8"><div class="skeleton"></div></td>
+            </tr>
+          }
+        } @else if (paginados().length === 0) {
+          <tr>
+            <td colspan="8">
+              <div class="empty">
+                <span class="empty__icon"></span>
+                <p>Este producto no tiene movimientos registrados.</p>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (m of paginados(); track m.id) {
+            <tr>
+              <td class="mono">{{ m.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span class="badge"
+                      [class.badge--success]="m.tipoMovimiento === 'ENTRADA'"
+                      [class.badge--danger]="m.tipoMovimiento === 'SALIDA'">
+                  {{ m.tipoMovimiento }}
+                </span>
+              </td>
+              <td class="mono">{{ m.cantidad }}</td>
+              <td class="mono">{{ m.costoUnitario | currency:'GTQ':'symbol-narrow':'1.2-2' }}</td>
+              <td class="mono" [class.muted]="m.tipoMovimiento === 'SALIDA'">
+                {{ m.tipoMovimiento === 'ENTRADA' ? m.saldoDisponible : '—' }}
+              </td>
+              <td>
+                <a class="ref-link" [routerLink]="refLink(m)">
+                  {{ m.referenciaTipo }} #{{ m.referenciaId }}
+                </a>
+              </td>
+              <td>{{ m.usuarioNombre }}</td>
+              <td class="mono">{{ m.stockNuevo }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (!loading() && movimientos().length > 0) {
+    <footer class="pagination">
+      <span class="pagination__info">
+        Mostrando {{ paginados().length }} de {{ movimientos().length }}
+      </span>
+      <div class="pagination__controls">
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === 1"
+                (click)="irPagina(page() - 1)">‹ Anterior</button>
+        <span class="pagination__page">{{ page() }} / {{ totalPaginas() }}</span>
+        <button class="btn btn--secondary btn--sm"
+                [disabled]="page() === totalPaginas()"
+                (click)="irPagina(page() + 1)">Siguiente ›</button>
+      </div>
+    </footer>
+  }
+</section>

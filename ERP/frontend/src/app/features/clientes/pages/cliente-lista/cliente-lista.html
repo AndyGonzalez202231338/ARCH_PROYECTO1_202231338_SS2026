@@ -1,0 +1,180 @@
+<app-toast></app-toast>
+
+<div class="clientes-page">
+  <div class="page-header">
+    <div class="page-header__text">
+      <nav class="breadcrumb">
+        <span>Inicio</span>
+        <span class="breadcrumb__sep">/</span>
+        <span class="breadcrumb__current">Clientes</span>
+      </nav>
+      <h1 class="page-header__title">Gestión de Clientes</h1>
+      <p class="page-header__subtitle">{{ subtitulo() }}</p>
+    </div>
+
+    @if (puedeCrear()) {
+      <button type="button" class="btn btn--primary" (click)="nuevoCliente()">
+        + Nuevo Cliente
+      </button>
+    }
+  </div>
+
+  <div class="filters-bar">
+    <div class="filters-bar__field filters-bar__field--grow">
+      <label>Buscar</label>
+      <input
+        type="text"
+        placeholder="Nombre o número de documento..."
+        [value]="texto()"
+        (input)="onTextoChange($any($event.target).value)" />
+    </div>
+
+    <select
+      class="filters-bar__select"
+      [value]="estadoFilter()"
+      (change)="onEstadoChange($any($event.target).value)">
+      <option value="todos">Todos</option>
+      <option value="activos">Activos</option>
+      <option value="inactivos">Inactivos</option>
+    </select>
+
+    @if (hasFiltros()) {
+      <button type="button" class="btn btn--ghost" (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+    }
+  </div>
+
+  <div class="table-card">
+    @if (errorCarga(); as mensaje) {
+      <div class="error-state">
+        <div class="error-state__icon">⚠</div>
+        <p class="error-state__title">No se pudieron cargar los clientes</p>
+        <p class="error-state__detail">{{ mensaje }}</p>
+      </div>
+    } @else {
+      @if (loading() || totalClientes() > 0) {
+        <table class="clientes-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo Doc</th>
+              <th>N° Doc</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Estado</th>
+              <th class="col-actions">Acciones</th>
+            </tr>
+          </thead>
+
+          @if (loading()) {
+            <tbody>
+              @for (i of [1, 2, 3, 4, 5]; track i) {
+                <tr class="skeleton-row">
+                  <td><div class="skeleton skeleton--lg"></div></td>
+                  <td><div class="skeleton skeleton--xs"></div></td>
+                  <td><div class="skeleton skeleton--sm"></div></td>
+                  <td><div class="skeleton skeleton--sm"></div></td>
+                  <td><div class="skeleton skeleton--lg"></div></td>
+                  <td><div class="skeleton skeleton--badge"></div></td>
+                  <td class="col-actions"><div class="skeleton skeleton--actions"></div></td>
+                </tr>
+              }
+            </tbody>
+          } @else {
+            <tbody>
+              @for (cliente of paginatedClientes(); track cliente.id) {
+                <tr>
+                  <td class="cliente-nombre">{{ cliente.nombre }}</td>
+                  <td class="text-muted">{{ cliente.tipoDocumento }}</td>
+                  <td>{{ cliente.numeroDocumento }}</td>
+                  <td class="text-muted">{{ cliente.telefono || '—' }}</td>
+                  <td class="text-muted">{{ cliente.email || '—' }}</td>
+                  <td>
+                    <span [class]="estadoBadgeClass(cliente.activo)">
+                      {{ cliente.activo ? 'ACTIVO' : 'INACTIVO' }}
+                    </span>
+                  </td>
+                  <td class="col-actions">
+                    <div class="acciones">
+                      <button type="button" class="action-btn" (click)="verDetalle(cliente)">
+                        Ver detalle
+                      </button>
+
+                      @if (puedeEditar()) {
+                        <button type="button" class="action-btn" (click)="editarCliente(cliente)">
+                          Editar
+                        </button>
+                      }
+
+                      @if (puedeActivar()) {
+                        <button
+                          type="button"
+                          class="action-btn"
+                          [class.action-btn--danger]="cliente.activo"
+                          [class.action-btn--success]="!cliente.activo"
+                          (click)="abrirCambioEstado(cliente)">
+                          {{ cliente.activo ? 'Desactivar' : 'Activar' }}
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          }
+        </table>
+      }
+
+      @if (!loading() && totalClientes() === 0) {
+        <div class="empty-state">
+          <div class="empty-state__icon">👤</div>
+          <p class="empty-state__title">No hay clientes que coincidan con los filtros</p>
+          @if (hasFiltros()) {
+            <button type="button" class="btn btn--secondary" (click)="limpiarFiltros()">
+              Limpiar filtros
+            </button>
+          }
+        </div>
+      }
+
+      @if (!loading() && totalClientes() > 0) {
+        <div class="pagination">
+          <span class="pagination__info">
+            Mostrando {{ rangoMostrado().desde }}-{{ rangoMostrado().hasta }} de {{ totalClientes() }} clientes
+          </span>
+
+          <div class="pagination__controls">
+            <button
+              type="button"
+              class="pagination__btn"
+              [disabled]="currentPage() === 1"
+              (click)="irAPagina(currentPage() - 1)">‹</button>
+            @for (pagina of paginasVisibles(); track pagina) {
+              <button
+                type="button"
+                class="pagination__btn"
+                [class.pagination__btn--active]="pagina === currentPage()"
+                (click)="irAPagina(pagina)">{{ pagina }}</button>
+            }
+            <button
+              type="button"
+              class="pagination__btn"
+              [disabled]="currentPage() === totalPages()"
+              (click)="irAPagina(currentPage() + 1)">›</button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+</div>
+
+<app-confirm-dialog
+  [open]="!!clienteParaEstado()"
+  [titulo]="tituloConfirmacion()"
+  [mensaje]="mensajeConfirmacion()"
+  [variante]="clienteParaEstado()?.activo ? 'danger' : 'success'"
+  [textoConfirmar]="clienteParaEstado()?.activo ? 'Desactivar' : 'Activar'"
+  (confirmar)="confirmarCambioEstado()"
+  (cancelar)="cerrarCambioEstado()">
+</app-confirm-dialog>

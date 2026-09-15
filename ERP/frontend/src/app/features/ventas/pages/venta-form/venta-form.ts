@@ -40,7 +40,7 @@ export class VentaForm {
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
 
-  readonly role = () => this.auth.getRole();;
+  readonly role = () => this.auth.getRole();
 
   /** Solo el rol VENTAS puede registrar ventas (coincide con el backend). */
   readonly puedeCrear = computed(() => this.role() === 'VENTAS');

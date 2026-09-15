@@ -1,0 +1,125 @@
+<app-toast></app-toast>
+
+<div class="form-page">
+  <div class="form-page__header">
+    <nav class="breadcrumb">
+      <span>Inicio</span>
+      <span class="breadcrumb__sep">/</span>
+      <a routerLink="/clientes">Clientes</a>
+      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__current">{{ titulo() }}</span>
+    </nav>
+
+    <button type="button" class="btn-back" (click)="cancelar()">← Volver</button>
+    <h1 class="form-page__title">{{ titulo() }}</h1>
+  </div>
+
+  @if (cargandoDatos()) {
+    <div class="form-card form-card--loading">
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+      <div class="skeleton skeleton--block"></div>
+    </div>
+  } @else {
+    <div class="form-card">
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="form-row">
+          <div class="field field--full">
+            <label class="field__label">
+              Nombre / Razón social <span class="field__required">*</span>
+            </label>
+            <input type="text" class="field__input" maxlength="150" formControlName="nombre" />
+            @if (campoInvalido('nombre')) {
+              <p class="field__error">El nombre es obligatorio (máx. 150 caracteres).</p>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label class="field__label">
+              Tipo de documento <span class="field__required">*</span>
+            </label>
+            <select class="field__input" formControlName="tipoDocumento">
+              @for (tipo of tiposDocumento; track tipo) {
+                <option [value]="tipo">{{ tipo }}</option>
+              }
+            </select>
+            @if (campoInvalido('tipoDocumento')) {
+              <p class="field__error">Selecciona un tipo de documento.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field__label">
+              Número de documento <span class="field__required">*</span>
+            </label>
+            <input
+              type="text"
+              class="field__input"
+              maxlength="30"
+              formControlName="numeroDocumento" />
+            @if (campoInvalido('numeroDocumento')) {
+              <p class="field__error">El número de documento es obligatorio (máx. 30).</p>
+            }
+            <p class="field__hint">Debe ser único en el sistema.</p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label class="field__label">Teléfono</label>
+            <input type="text" class="field__input" formControlName="telefono" />
+          </div>
+
+          <div class="field">
+            <label class="field__label">Email</label>
+            <input type="email" class="field__input" formControlName="email" />
+            @if (campoInvalido('email')) {
+              <p class="field__error">Ingresa un email con formato válido.</p>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field field--full">
+            <label class="field__label">Dirección</label>
+            <input type="text" class="field__input" maxlength="255" formControlName="direccion" />
+            @if (campoInvalido('direccion')) {
+              <p class="field__error">Máximo 255 caracteres.</p>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label class="field__label">Estado</label>
+            <div class="toggle-group">
+              <button
+                type="button"
+                class="toggle-group__btn"
+                [class.toggle-group__btn--active]="form.get('activo')?.value === true"
+                (click)="onActivoChange(true)">
+                Activo
+              </button>
+              <button
+                type="button"
+                class="toggle-group__btn"
+                [class.toggle-group__btn--active]="form.get('activo')?.value === false"
+                (click)="onActivoChange(false)">
+                Inactivo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card__actions">
+          <button type="button" class="btn btn--secondary" (click)="cancelar()">Cancelar</button>
+          <button type="submit" class="btn btn--primary" [disabled]="form.invalid || guardando()">
+            {{ guardando() ? 'Guardando...' : 'Guardar Cliente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
