@@ -40,9 +40,8 @@
     <select class="filters-bar__select" [value]="estadoFilter()" (change)="onEstadoChange($any($event.target).value)">
       <option value="todos">Todos los estados</option>
       <option value="PENDIENTE">Pendiente</option>
-      <option value="EN_TRANSITO">En tránsito</option>
-      <option value="RECIBIDA">Recibida</option>
-      <option value="CANCELADA">Cancelada</option>
+      <option value="COMPLETADA">Completada</option>
+      <option value="ANULADA">Anulada</option>
     </select>
 
     @if (hasFiltros()) {
@@ -93,10 +92,6 @@
                 <td class="col-actions">
                   <div class="acciones">
                     <button type="button" class="action-btn" (click)="verDetalle(compra)">Ver</button>
-
-                    @if (puedeEditar(compra)) {
-                      <button type="button" class="action-btn" (click)="editarCompra(compra)">Editar</button>
-                    }
 
                     @if (puedeCambiarEstado(compra)) {
                       <button type="button" class="action-btn action-btn--success" (click)="abrirRecibir(compra)">
@@ -151,8 +146,8 @@
   [open]="!!compraParaEstado()"
   [titulo]="tituloConfirmacion()"
   [mensaje]="mensajeConfirmacion()"
-  [variante]="accionEstado() === 'RECIBIDA' ? 'success' : 'danger'"
-  [textoConfirmar]="accionEstado() === 'RECIBIDA' ? 'Marcar como recibida' : 'Cancelar compra'"
+  [variante]="accionEstado() === 'COMPLETADA' ? 'success' : 'danger'"
+  [textoConfirmar]="accionEstado() === 'COMPLETADA' ? 'Marcar como completada' : 'Cancelar compra'"
   (confirmar)="confirmarCambioEstado()"
   (cancelar)="cerrarConfirmacionEstado()">
 </app-confirm-dialog>

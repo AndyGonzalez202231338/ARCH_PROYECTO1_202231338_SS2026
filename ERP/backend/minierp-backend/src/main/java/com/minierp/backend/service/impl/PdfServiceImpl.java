@@ -71,7 +71,7 @@ public class PdfServiceImpl implements PdfService {
             // ---- Totales ----
             doc.add(new Paragraph("Subtotal: Q " + venta.getSubtotal())
                     .setTextAlignment(TextAlignment.RIGHT));
-            doc.add(new Paragraph("IVA (19%): Q " + venta.getImpuesto())
+            doc.add(new Paragraph("IVA (12%): Q " + venta.getImpuesto())
                     .setTextAlignment(TextAlignment.RIGHT));
             doc.add(new Paragraph("TOTAL: Q " + venta.getTotal())
                     .setBold().setFontSize(14)

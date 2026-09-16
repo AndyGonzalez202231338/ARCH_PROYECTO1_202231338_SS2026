@@ -16,7 +16,7 @@ import { ClienteService } from '../../services/cliente.service';
 import { InventarioService } from '../../services/inventario.service';
 import { VentaService } from '../../services/venta.service';
 
-const IVA_TASA = 0.19;
+const IVA_TASA = 0.12;
 
 interface FilaValor {
   productoId: number | null;

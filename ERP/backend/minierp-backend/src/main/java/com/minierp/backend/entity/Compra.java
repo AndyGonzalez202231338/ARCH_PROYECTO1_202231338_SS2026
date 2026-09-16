@@ -173,13 +173,21 @@ public class Compra {
      */
     public void recalcularTotales() {
         BigDecimal nuevoSubtotal = detalles.stream()
-                .map(DetalleCompra::getSubtotal)
-                .filter(java.util.Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(d -> {
+                    if (d.getSubtotal() != null) return d.getSubtotal();
+                    if (d.getPrecioUnitario() != null && d.getCantidad() != null) {
+                        return d.getPrecioUnitario().multiply(BigDecimal.valueOf(d.getCantidad()));
+                    }
+                    return BigDecimal.ZERO;
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, java.math.RoundingMode.HALF_UP);   // ← escala 2
 
         this.subtotal = nuevoSubtotal;
-        this.impuesto = nuevoSubtotal.multiply(new BigDecimal("0.19"));
-        this.total = this.subtotal.add(this.impuesto);
+        this.impuesto = nuevoSubtotal.multiply(new BigDecimal("0.12"))
+                .setScale(2, java.math.RoundingMode.HALF_UP);   // ← escala 2
+        this.total = this.subtotal.add(this.impuesto)
+                .setScale(2, java.math.RoundingMode.HALF_UP);   // ← escala 2
     }
 
     @Override

@@ -128,7 +128,7 @@
 
       @if (!loading() && totalVentas() === 0) {
         <div class="empty-state">
-          <div class="empty-state__icon">🧾</div>
+          <div class="empty-state__icon"></div>
           <p class="empty-state__title">No hay ventas que coincidan con los filtros</p>
           @if (hasFiltros()) {
             <button type="button" class="btn btn--secondary" (click)="limpiarFiltros()">

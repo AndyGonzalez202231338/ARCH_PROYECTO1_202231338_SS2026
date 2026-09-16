@@ -39,6 +39,28 @@ export class ReporteDetalleComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
+  /* ---------- Catálogo de módulos y acciones ---------- */
+  readonly modulos = [
+    'USUARIOS',
+    'PRODUCTOS',
+    'CATEGORIAS',
+    'PROVEEDORES',
+    'CLIENTES',
+    'COMPRAS',
+    'VENTAS',
+    'INVENTARIO',
+  ];
+
+  readonly acciones = [
+    'CREAR',
+    'ACTUALIZAR',
+    'ACTIVAR',
+    'DESACTIVAR',
+    'CAMBIO_PASSWORD',
+    'CAMBIO_ESTADO',
+    'ELIMINAR',
+  ];
+
   /* ---------- Estado principal ---------- */
   readonly tipo = signal<TipoReporte>('productos-mas-vendidos');
   readonly config = computed(() => getReporteConfig(this.tipo()));
@@ -51,6 +73,8 @@ export class ReporteDetalleComponent implements OnInit {
   readonly agrupacion = signal<'DIA' | 'MES' | 'ANIO'>('MES');
   readonly productoId = signal<number | null>(null);
   readonly texto = signal<string>('');
+  readonly modulo = signal<string>('');
+  readonly tipoAccion = signal<string>('');
 
   /* ---------- Catálogo de productos (solo para historial) ---------- */
   readonly productos = signal<ProductoResponse[]>([]);
@@ -153,7 +177,13 @@ export class ReporteDetalleComponent implements OnInit {
         case 'resumen-ventas':
         obs$ = this.service.resumenVentas(f); break;
         case 'logs-auditoria':
-        obs$ = this.service.logsAuditoria({ ...f, texto: this.texto() || undefined }); break;
+          obs$ = this.service.logsAuditoria({
+            ...f,
+            modulo: this.modulo() || undefined,
+            tipoAccion: this.tipoAccion() || undefined,
+            texto: this.texto() || undefined,
+          });
+          break;
     }
 
     if (!obs$) { this.loading.set(false); return; }   // salvavidas por si el tipo no matchea
@@ -198,6 +228,8 @@ export class ReporteDetalleComponent implements OnInit {
     this.agrupacion.set('MES');
     this.productoId.set(null);
     this.texto.set('');
+    this.modulo.set('');
+    this.tipoAccion.set('');
     this.cargar();
   }
 
