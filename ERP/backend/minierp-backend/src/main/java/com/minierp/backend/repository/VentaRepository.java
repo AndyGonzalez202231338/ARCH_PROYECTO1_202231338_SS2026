@@ -32,48 +32,76 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
      * Filtro por rango de fechas, cliente y estado.
      */
     @Query("SELECT v FROM Venta v JOIN FETCH v.cliente " +
-              "WHERE (CAST(:fechaDesde AS timestamp) IS NULL OR v.fecha >= :fechaDesde) " +
-              "AND (CAST(:fechaHasta AS timestamp) IS NULL OR v.fecha <= :fechaHasta) " +
-              "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
-              "AND (CAST(:estado AS string) IS NULL OR v.estado = :estado) " +
+       "WHERE (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
+       "AND (:estado IS NULL OR v.estado = :estado) " +
               "ORDER BY v.fecha DESC")
-       List<Venta> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
-                     @Param("fechaHasta") LocalDateTime fechaHasta,
-                     @Param("clienteId") Long clienteId,
-                     @Param("estado") EstadoVenta estado);
+       List<Venta> filtrarSinFechas(@Param("clienteId") Long clienteId,
+                                   @Param("estado") EstadoVenta estado);
+
+       @Query("SELECT v FROM Venta v JOIN FETCH v.cliente " +
+              "WHERE v.fecha >= :fechaDesde " +
+              "AND v.fecha <= :fechaHasta " +
+              "AND (:clienteId IS NULL OR v.cliente.id = :clienteId) " +
+              "AND (:estado IS NULL OR v.estado = :estado) " +
+              "ORDER BY v.fecha DESC")
+       List<Venta> filtrarEnRango(@Param("fechaDesde") LocalDateTime fechaDesde,
+                            @Param("fechaHasta") LocalDateTime fechaHasta,
+                            @Param("clienteId") Long clienteId,
+                            @Param("estado") EstadoVenta estado);
 
     /**
      * Top N clientes con mayor monto acumulado de compras (ventas).
      */
-    @Query("SELECT v.cliente.id, v.cliente.nombre, SUM(v.total) " +
-           "FROM Venta v " +
-           "WHERE v.estado = 'COMPLETADA' " +
-           "GROUP BY v.cliente.id, v.cliente.nombre " +
-           "ORDER BY SUM(v.total) DESC")
-    List<Object[]> findTopClientesPorMonto(org.springframework.data.domain.Pageable pageable);
+    @Query("SELECT v.cliente.id, v.cliente.nombre, COUNT(v.id), SUM(v.total) " +
+       "FROM Venta v " +
+       "GROUP BY v.cliente.id, v.cliente.nombre " +
+       "ORDER BY SUM(v.total) DESC")
+       List<Object[]> findTopClientesPorMonto(org.springframework.data.domain.Pageable pageable);
 
     /**
      * Resumen de ventas agrupado por día, mes o año.
      * agrupacion = 'DIA' | 'MES' | 'ANIO'
      * Devuelve [periodo (String), cantidadVentas, totalVentas]
      */
-    @Query(value =
-           "SELECT " +
-           "  CASE :agrupacion " +
-           "    WHEN 'DIA'  THEN TO_CHAR(v.fecha, 'YYYY-MM-DD') " +
-           "    WHEN 'MES'  THEN TO_CHAR(v.fecha, 'YYYY-MM') " +
-           "    WHEN 'ANIO' THEN TO_CHAR(v.fecha, 'YYYY') " +
-           "  END AS periodo, " +
-           "  COUNT(v.id) AS cantidad, " +
-           "  SUM(v.total) AS total " +
-           "FROM ventas v " +
-           "WHERE v.estado = 'COMPLETADA' " +
-           "  AND (:fechaDesde IS NULL OR v.fecha >= :fechaDesde) " +
-           "  AND (:fechaHasta IS NULL OR v.fecha <= :fechaHasta) " +
-           "GROUP BY periodo " +
-           "ORDER BY periodo DESC",
-           nativeQuery = true)
-    List<Object[]> resumenVentasPorPeriodo(@Param("agrupacion") String agrupacion,
-                                           @Param("fechaDesde") LocalDateTime fechaDesde,
-                                           @Param("fechaHasta") LocalDateTime fechaHasta);
+       @Query(value =
+              "SELECT TO_CHAR(v.fecha, 'YYYY-MM-DD') AS periodo, " +
+              "       COUNT(v.id) AS cantidad, " +
+              "       SUM(v.total) AS total " +
+              "FROM ventas v " +
+              "WHERE v.estado = 'COMPLETADA' " +
+              "  AND v.fecha >= :fechaDesde " +
+              "  AND v.fecha <= :fechaHasta " +
+              "GROUP BY periodo " +
+              "ORDER BY periodo DESC",
+              nativeQuery = true)
+       List<Object[]> resumenVentasPorDia(@Param("fechaDesde") LocalDateTime fechaDesde,
+                                          @Param("fechaHasta") LocalDateTime fechaHasta);
+
+       @Query(value =
+              "SELECT TO_CHAR(v.fecha, 'YYYY-MM') AS periodo, " +
+              "       COUNT(v.id) AS cantidad, " +
+              "       SUM(v.total) AS total " +
+              "FROM ventas v " +
+              "WHERE v.estado = 'COMPLETADA' " +
+              "  AND v.fecha >= :fechaDesde " +
+              "  AND v.fecha <= :fechaHasta " +
+              "GROUP BY periodo " +
+              "ORDER BY periodo DESC",
+              nativeQuery = true)
+       List<Object[]> resumenVentasPorMes(@Param("fechaDesde") LocalDateTime fechaDesde,
+                                          @Param("fechaHasta") LocalDateTime fechaHasta);
+
+       @Query(value =
+              "SELECT TO_CHAR(v.fecha, 'YYYY') AS periodo, " +
+              "       COUNT(v.id) AS cantidad, " +
+              "       SUM(v.total) AS total " +
+              "FROM ventas v " +
+              "WHERE v.estado = 'COMPLETADA' " +
+              "  AND v.fecha >= :fechaDesde " +
+              "  AND v.fecha <= :fechaHasta " +
+              "GROUP BY periodo " +
+              "ORDER BY periodo DESC",
+              nativeQuery = true)
+       List<Object[]> resumenVentasPorAnio(@Param("fechaDesde") LocalDateTime fechaDesde,
+                                          @Param("fechaHasta") LocalDateTime fechaHasta);
 }

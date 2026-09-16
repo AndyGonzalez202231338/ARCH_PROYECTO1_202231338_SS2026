@@ -220,11 +220,14 @@ export class ReporteDetalleComponent implements OnInit {
       case 'productos-mas-movimientos':
       case 'productos-mas-adquiridos':
       case 'productos-mayores-ingresos':
-        return {
-          header: ['#', 'Código', 'Producto', 'Valor'],
-          rows: this.topProductos().map((p, i) =>
-            [String(i + 1), p.codigo ?? '', `"${p.nombre}"`, String(p.valor)]),
-        };
+  return {
+    header: ['#', 'Producto', this.etiquetaValor()],
+    rows: this.topProductos().map((p, i) => [
+      String(i + 1),
+      `"${p.nombre}"`,
+      String(p.valor),
+    ]),
+  };
       case 'productos-menor-existencia':
         return {
           header: ['Código', 'Producto', 'Stock', 'Mínimo'],
@@ -288,13 +291,22 @@ export class ReporteDetalleComponent implements OnInit {
     if (!max) return '0%';
     return `${Math.max(4, (v / max) * 100)}%`;
   }
-  esMonto(tipo: TipoReporte): boolean {
-    return tipo === 'productos-mayores-ingresos' || tipo === 'productos-mas-adquiridos';
+  esMonto(): boolean {
+    return this.tipo() === 'productos-mayores-ingresos';
   }
+
   refLink(m: MovimientoInventarioResponse): string {
     return m.referenciaTipo === 'COMPRA' ? `/compras/${m.referenciaId}` : `/ventas/${m.referenciaId}`;
   }
 
-
+  etiquetaValor(): string {
+    switch (this.tipo()) {
+      case 'productos-mayores-ingresos': return 'Ingresos (Q)';
+      case 'productos-mas-adquiridos':   return 'Cantidad comprada';
+      case 'productos-mas-vendidos':     return 'Cantidad vendida';
+      case 'productos-mas-movimientos':  return 'Movimientos';
+      default:                           return 'Valor';
+    }
+  }
   
 }

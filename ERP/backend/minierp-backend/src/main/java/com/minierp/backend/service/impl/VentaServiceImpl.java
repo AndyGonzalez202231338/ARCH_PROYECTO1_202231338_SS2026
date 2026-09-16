@@ -108,15 +108,25 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<VentaResumenResponse> listar(LocalDateTime desde, LocalDateTime hasta,
-                                             Long clienteId) {
-        return ventaRepository.filtrar(desde, hasta, clienteId, null).stream()
+        @Transactional(readOnly = true)
+        public List<VentaResumenResponse> listar(LocalDateTime desde, LocalDateTime hasta,
+                                                Long clienteId) {
+        List<Venta> ventas;
+
+        if (desde == null && hasta == null) {
+                ventas = ventaRepository.filtrarSinFechas(clienteId, null);
+        } else {
+                LocalDateTime d = desde != null ? desde : LocalDateTime.of(1900, 1, 1, 0, 0);
+                LocalDateTime h = hasta != null ? hasta : LocalDateTime.now().plusYears(100);
+                ventas = ventaRepository.filtrarEnRango(d, h, clienteId, null);
+        }
+
+        return ventas.stream()
                 .map(v -> new VentaResumenResponse(
                         v.getId(), v.getNumeroVenta(), v.getCliente().getNombre(),
                         v.getFecha(), v.getTotal(), v.getEstado()))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)
