@@ -88,7 +88,8 @@ public class DetalleCompra {
     @PreUpdate
     public void calcularSubtotal() {
         if (cantidad != null && precioUnitario != null) {
-            this.subtotal = precioUnitario.multiply(BigDecimal.valueOf(cantidad));
+            this.subtotal = precioUnitario.multiply(BigDecimal.valueOf(cantidad))
+                    .setScale(2, java.math.RoundingMode.HALF_UP);
         }
     }
 

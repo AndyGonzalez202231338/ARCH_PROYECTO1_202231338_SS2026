@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,14 +23,18 @@ public class AuditoriaController {
     @GetMapping
     public ResponseEntity<List<LogAuditoriaResponse>> listar(
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam(required = false) Long usuarioId,
             @RequestParam(required = false) String modulo,
             @RequestParam(required = false) String tipoAccion,
             @RequestParam(required = false) String texto) {
+
+        LocalDateTime desdeDt = desde != null ? desde.atStartOfDay() : null;
+        LocalDateTime hastaDt = hasta != null ? hasta.atTime(23, 59, 59) : null;
+
         return ResponseEntity.ok(auditoriaService.buscar(
-                desde, hasta, usuarioId, modulo, tipoAccion, texto));
+                desdeDt, hastaDt, usuarioId, modulo, tipoAccion, texto));
     }
 }

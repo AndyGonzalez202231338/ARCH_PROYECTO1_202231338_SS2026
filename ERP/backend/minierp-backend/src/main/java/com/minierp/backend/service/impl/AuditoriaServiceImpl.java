@@ -52,14 +52,27 @@ public class AuditoriaServiceImpl implements AuditoriaService {
     @Override
     @Transactional(readOnly = true)
     public List<LogAuditoriaResponse> buscar(LocalDateTime fechaDesde,
-                                             LocalDateTime fechaHasta,
-                                             Long usuarioId,
-                                             String modulo,
-                                             String tipoAccion,
-                                             String texto) {
-        return logRepository
-                .filtrar(fechaDesde, fechaHasta, usuarioId, modulo, tipoAccion, texto)
-                .stream()
+                                            LocalDateTime fechaHasta,
+                                            Long usuarioId,
+                                            String modulo,
+                                            String tipoAccion,
+                                            String texto) {
+
+        String mod = (modulo == null) ? "" : modulo.trim();
+        String tip = (tipoAccion == null) ? "" : tipoAccion.trim();
+        String txt = (texto == null || texto.isBlank()) ? "" : texto.trim();
+
+        List<LogAuditoria> logs;
+
+        if (fechaDesde == null && fechaHasta == null) {
+            logs = logRepository.filtrarSinFechas(usuarioId, mod, tip, txt);
+        } else {
+            LocalDateTime d = fechaDesde != null ? fechaDesde : LocalDateTime.of(1900, 1, 1, 0, 0);
+            LocalDateTime h = fechaHasta != null ? fechaHasta : LocalDateTime.now().plusYears(100);
+            logs = logRepository.filtrarEnRango(d, h, usuarioId, mod, tip, txt);
+        }
+
+        return logs.stream()
                 .map(this::toResponse)
                 .toList();
     }

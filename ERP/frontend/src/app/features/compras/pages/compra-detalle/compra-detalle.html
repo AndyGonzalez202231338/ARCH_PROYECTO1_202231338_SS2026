@@ -86,11 +86,8 @@
       </div>
     </div>
 
-    @if (puedeEditar() || puedeRecibir() || puedeCancelar()) {
+    @if (puedeRecibir() || puedeCancelar()) {
       <div class="detalle-acciones">
-        @if (puedeEditar()) {
-          <button type="button" class="btn btn--secondary" (click)="editar()">Editar compra</button>
-        }
         @if (puedeRecibir()) {
           <button type="button" class="btn btn--success" (click)="abrirRecibir()">Marcar como RECIBIDA</button>
         }
@@ -107,8 +104,8 @@
   [open]="confirmarAbierto()"
   [titulo]="tituloConfirmacion()"
   [mensaje]="mensajeConfirmacion()"
-  [variante]="accionEstado() === 'RECIBIDA' ? 'success' : 'danger'"
-  [textoConfirmar]="accionEstado() === 'RECIBIDA' ? 'Marcar como recibida' : 'Cancelar compra'"
+  [variante]="accionEstado() === 'COMPLETADA' ? 'success' : 'danger'"
+  [textoConfirmar]="accionEstado() === 'COMPLETADA' ? 'Marcar como completada' : 'Cancelar compra'"
   (confirmar)="confirmarCambioEstado()"
   (cancelar)="cerrarConfirmacion()">
 </app-confirm-dialog>

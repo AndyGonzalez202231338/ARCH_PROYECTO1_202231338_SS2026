@@ -28,7 +28,7 @@ export class VentaDetalle {
 
   private readonly ventaId = Number(this.route.snapshot.paramMap.get('id'));
 
-  readonly role = this.auth.getRole;
+  readonly role = () => this.auth.getRole();
 
   readonly puedeDescargarFactura = computed(
     () => this.role() === 'VENTAS' || this.role() === 'ADMINISTRACION',

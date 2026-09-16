@@ -1,4 +1,4 @@
-export type EstadoCompra = 'PENDIENTE' | 'EN_TRANSITO' | 'RECIBIDA' | 'CANCELADA';
+export type EstadoCompra = 'PENDIENTE' | 'COMPLETADA' | 'ANULADA';
 
 export interface DetalleCompraResponse {
   id: number;

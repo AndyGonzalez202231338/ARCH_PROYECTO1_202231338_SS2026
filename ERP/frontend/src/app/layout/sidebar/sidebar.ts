@@ -20,7 +20,6 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Ventas', icon: 'chart-bar', path: '/ventas' },
     { label: 'Reportes', icon: 'document-chart-bar', path: '/reportes' },
     { label: 'Usuarios', icon: 'user-circle', path: '/usuarios' },
-    { label: 'Actividad', icon: 'list-bullet', path: '/actividad' },
   ],
   COMPRAS: [
     { label: 'Dashboard', icon: 'home', path: '/dashboard' },
@@ -37,6 +36,7 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Inventario', icon: 'archive-box', path: '/inventario' },
     //{ label: 'Movimientos', icon: 'arrow-path', path: '/inventario/movimientos' },
     { label: 'Alertas de existencias', icon: 'exclamation-triangle', path: '/inventario/alertas' },
+    { label: 'Reportes', icon: 'document-chart-bar', path: '/reportes' },
   ],
   VENTAS: [
     { label: 'Dashboard', icon: 'home', path: '/dashboard' },
@@ -44,6 +44,7 @@ const MENU_BY_ROLE: Record<string, MenuItem[]> = {
     { label: 'Productos', icon: 'cube', path: '/productos' },
     { label: 'Ventas', icon: 'chart-bar', path: '/ventas' },
     { label: 'Nueva venta', icon: 'shopping-cart', path: '/ventas/nueva' },
+    { label: 'Reportes', icon: 'document-chart-bar', path: '/reportes' },
     // 'Historial de ventas' se eliminó: el listado único de /ventas ya
     // incluye filtros por fecha y cliente.
   ],

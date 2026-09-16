@@ -10,7 +10,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { Toast } from '../../../../core/models/toast/toast';
 
 
-type AccionEstado = 'RECIBIDA' | 'CANCELADA';
+type AccionEstado = 'COMPLETADA' | 'ANULADA';
 
 @Component({
   selector: 'app-compra-detalle',
@@ -38,13 +38,11 @@ export class CompraDetalle {
   readonly role = computed(() => this.auth.currentUser()?.rol ?? null);
   readonly puedeGestionar = computed(() => this.role() === 'COMPRAS');
 
-  readonly puedeEditar = computed(() =>
-    this.puedeGestionar() && this.compra()?.estado === 'PENDIENTE',
-  );
+
 
   readonly puedeRecibir = computed(() => {
     const estado = this.compra()?.estado;
-    return this.puedeGestionar() && (estado === 'PENDIENTE' || estado === 'EN_TRANSITO');
+    return this.puedeGestionar() && estado === 'PENDIENTE';
   });
 
   readonly puedeCancelar = computed(() => this.puedeRecibir());
@@ -72,17 +70,13 @@ export class CompraDetalle {
     this.router.navigate(['/compras']);
   }
 
-  editar(): void {
-    this.router.navigate(['/compras', this.compraId, 'editar']);
-  }
-
   abrirRecibir(): void {
-    this.accionEstado.set('RECIBIDA');
+    this.accionEstado.set('COMPLETADA');
     this.confirmarAbierto.set(true);
   }
 
   abrirCancelar(): void {
-    this.accionEstado.set('CANCELADA');
+    this.accionEstado.set('ANULADA');
     this.confirmarAbierto.set(true);
   }
 
@@ -103,9 +97,9 @@ export class CompraDetalle {
         this.accionEstado.set(null);
         this.compra.set(actualizada);
         this.notifications.success(
-          accion === 'RECIBIDA'
-            ? 'Compra recibida correctamente. Inventario actualizado.'
-            : 'Compra cancelada.',
+          accion === 'COMPLETADA'
+            ? 'Compra completada correctamente. Inventario actualizado.'
+            : 'Compra anulada.',
         );
       },
       error: () => {
@@ -116,13 +110,13 @@ export class CompraDetalle {
   }
 
   tituloConfirmacion(): string {
-    return this.accionEstado() === 'RECIBIDA' ? '¿Marcar esta compra como RECIBIDA?' : '¿Cancelar esta compra?';
+    return this.accionEstado() === 'COMPLETADA' ? '¿Marcar esta compra como COMPLETADA?' : '¿Anular esta compra?';
   }
 
   mensajeConfirmacion(): string {
-    return this.accionEstado() === 'RECIBIDA'
+    return this.accionEstado() === 'COMPLETADA'
       ? 'Se cargarán los productos de esta compra al inventario.'
-      : 'La compra quedará marcada como cancelada y no podrá modificarse.';
+      : 'La compra quedará marcada como anulada y no podrá modificarse.';
   }
 
   estadoBadgeClass(): string {

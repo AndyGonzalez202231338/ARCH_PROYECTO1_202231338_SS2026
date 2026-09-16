@@ -71,9 +71,29 @@
 
       @if (tipo() === 'logs-auditoria') {
         <label class="filters__label">
+          Módulo
+          <select class="input" [ngModel]="modulo()" (ngModelChange)="modulo.set($event)">
+            <option value="">Todos</option>
+            @for (m of modulos; track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="filters__label">
+          Acción
+          <select class="input" [ngModel]="tipoAccion()" (ngModelChange)="tipoAccion.set($event)">
+            <option value="">Todas</option>
+            @for (a of acciones; track a) {
+              <option [value]="a">{{ a }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="filters__label">
           Texto
           <input type="text" class="input" placeholder="Buscar…"
-                 [ngModel]="texto()" (ngModelChange)="texto.set($event)" />
+                [ngModel]="texto()" (ngModelChange)="texto.set($event)" />
         </label>
       }
 
