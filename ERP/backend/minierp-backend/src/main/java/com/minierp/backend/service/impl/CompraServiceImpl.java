@@ -132,15 +132,25 @@ public class CompraServiceImpl implements CompraService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<CompraResumenResponse> listar(LocalDateTime desde, LocalDateTime hasta,
-                                              Long proveedorId) {
-        return compraRepository.filtrar(desde, hasta, proveedorId, null).stream()
+        @Transactional(readOnly = true)
+        public List<CompraResumenResponse> listar(LocalDateTime desde, LocalDateTime hasta,
+                                                Long proveedorId) {
+        List<Compra> compras;
+
+        if (desde == null && hasta == null) {
+                compras = compraRepository.filtrarSinFechas(proveedorId, null);
+        } else {
+                LocalDateTime d = desde != null ? desde : LocalDateTime.of(1900, 1, 1, 0, 0);
+                LocalDateTime h = hasta != null ? hasta : LocalDateTime.now().plusYears(100);
+                compras = compraRepository.filtrarEnRango(d, h, proveedorId, null);
+        }
+
+        return compras.stream()
                 .map(c -> new CompraResumenResponse(
                         c.getId(), c.getNumeroCompra(), c.getProveedor().getNombre(),
                         c.getFecha(), c.getTotal(), c.getEstado()))
                 .toList();
-    }
+        }
 
     private String generarNumero() {
         long siguiente = compraRepository.count() + 1;

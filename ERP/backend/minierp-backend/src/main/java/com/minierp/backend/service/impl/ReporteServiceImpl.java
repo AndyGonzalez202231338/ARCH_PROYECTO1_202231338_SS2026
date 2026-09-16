@@ -87,15 +87,19 @@ public class ReporteServiceImpl implements ReporteService {
         }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<TopProveedorResponse> topProveedores(int top) {
+        @Transactional(readOnly = true)
+        public List<TopProveedorResponse> topProveedores(int top) {
         Pageable limit = PageRequest.of(0, top);
         return compraRepository.findTopProveedoresPorMonto(limit).stream()
                 .map(r -> new TopProveedorResponse(
-                        (Long) r[0], (String) r[1], 0L,
-                        (BigDecimal) r[2]))
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        ((Number) r[2]).longValue(),          // cantidadCompras real
+                        r[3] instanceof BigDecimal b
+                                ? b
+                                : BigDecimal.valueOf(((Number) r[3]).doubleValue())))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)

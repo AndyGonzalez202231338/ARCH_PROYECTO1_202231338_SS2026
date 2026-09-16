@@ -294,4 +294,7 @@ export class ReporteDetalleComponent implements OnInit {
   refLink(m: MovimientoInventarioResponse): string {
     return m.referenciaTipo === 'COMPRA' ? `/compras/${m.referenciaId}` : `/ventas/${m.referenciaId}`;
   }
+
+
+  
 }
