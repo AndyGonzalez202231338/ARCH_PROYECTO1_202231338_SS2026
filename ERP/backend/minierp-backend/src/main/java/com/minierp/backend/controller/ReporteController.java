@@ -50,7 +50,7 @@ public class ReporteController {
     @GetMapping("/top-proveedores")
     public ResponseEntity<List<TopProveedorResponse>> topProveedores(
             @RequestParam(defaultValue = "5") int top) {
-        return ResponseEntity.ok(reporteService.topProveedores(top));
+    return ResponseEntity.ok(reporteService.topProveedores(top));
     }
 
     @GetMapping("/productos-mas-adquiridos")

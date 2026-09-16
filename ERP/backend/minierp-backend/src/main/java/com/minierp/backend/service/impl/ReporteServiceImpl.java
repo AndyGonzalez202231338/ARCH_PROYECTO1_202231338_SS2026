@@ -25,16 +25,28 @@ public class ReporteServiceImpl implements ReporteService {
     private final ProductoRepository productoRepository;
 
     @Override
-    @Transactional(readOnly = true)
-    public List<TopProductoResponse> topProductosMasVendidos(
-            LocalDateTime desde, LocalDateTime hasta, int top) {
+        @Transactional(readOnly = true)
+        public List<TopProductoResponse> topProductosMasVendidos(
+                LocalDateTime desde, LocalDateTime hasta, int top) {
+
         Pageable limit = PageRequest.of(0, top);
-        return detalleVentaRepository.findTopProductosMasVendidos(desde, hasta, limit)
-                .stream()
+        List<Object[]> resultados;
+
+        if (desde == null && hasta == null) {
+                resultados = detalleVentaRepository.findTopProductosMasVendidosSinFechas(limit);
+        } else {
+                LocalDateTime d = desde != null ? desde : LocalDateTime.of(1900, 1, 1, 0, 0);
+                LocalDateTime h = hasta != null ? hasta : LocalDateTime.now().plusYears(100);
+                resultados = detalleVentaRepository.findTopProductosMasVendidosEnRango(d, h, limit);
+        }
+
+        return resultados.stream()
                 .map(r -> new TopProductoResponse(
-                        (Long) r[0], (String) r[1], BigDecimal.valueOf(((Number) r[2]).longValue())))
+                        (Long) r[0],
+                        (String) r[1],
+                        BigDecimal.valueOf(((Number) r[2]).longValue())))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)
@@ -75,15 +87,19 @@ public class ReporteServiceImpl implements ReporteService {
         }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<TopProveedorResponse> topProveedores(int top) {
+        @Transactional(readOnly = true)
+        public List<TopProveedorResponse> topProveedores(int top) {
         Pageable limit = PageRequest.of(0, top);
         return compraRepository.findTopProveedoresPorMonto(limit).stream()
                 .map(r -> new TopProveedorResponse(
-                        (Long) r[0], (String) r[1], 0L,
-                        (BigDecimal) r[2]))
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        ((Number) r[2]).longValue(),          // cantidadCompras real
+                        r[3] instanceof BigDecimal b
+                                ? b
+                                : BigDecimal.valueOf(((Number) r[3]).doubleValue())))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)

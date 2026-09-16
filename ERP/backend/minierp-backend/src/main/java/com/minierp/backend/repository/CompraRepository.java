@@ -29,27 +29,37 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
     Optional<Compra> findByIdConDetalles(@Param("id") Long id);
 
     /**
-     * Filtro por rango de fechas, proveedor y estado.
-     */
-    @Query("SELECT c FROM Compra c JOIN FETCH c.proveedor " +
-       "WHERE (CAST(:fechaDesde AS timestamp) IS NULL OR c.fecha >= :fechaDesde) " +
-       "AND (CAST(:fechaHasta AS timestamp) IS NULL OR c.fecha <= :fechaHasta) " +
-       "AND (:proveedorId IS NULL OR c.proveedor.id = :proveedorId) " +
-       "AND (CAST(:estado AS string) IS NULL OR c.estado = :estado) " +
-       "ORDER BY c.fecha DESC")
-       List<Compra> filtrar(@Param("fechaDesde") LocalDateTime fechaDesde,
-                     @Param("fechaHasta") LocalDateTime fechaHasta,
-                     @Param("proveedorId") Long proveedorId,
-                     @Param("estado") EstadoCompra estado);
-
-    /**
      * Top N proveedores con mayor monto acumulado de compras.
      * Devuelve pares [proveedorId, nombre, totalCompras].
      */
-    @Query("SELECT c.proveedor.id, c.proveedor.nombre, SUM(c.total) " +
-           "FROM Compra c " +
-           "WHERE c.estado = 'RECIBIDA' " +
-           "GROUP BY c.proveedor.id, c.proveedor.nombre " +
-           "ORDER BY SUM(c.total) DESC")
-    List<Object[]> findTopProveedoresPorMonto(org.springframework.data.domain.Pageable pageable);
+    @Query("SELECT c.proveedor.id, c.proveedor.nombre, COUNT(c.id), SUM(c.total) " +
+       "FROM Compra c " +
+       "GROUP BY c.proveedor.id, c.proveedor.nombre " +
+       "ORDER BY SUM(c.total) DESC")
+       List<Object[]> findTopProveedoresPorMonto(org.springframework.data.domain.Pageable pageable);
+
+       /**
+        * Compras SIN filtro de fechas (solo proveedor y estado).
+        */
+       @Query("SELECT c FROM Compra c JOIN FETCH c.proveedor " +
+              "WHERE (:proveedorId IS NULL OR c.proveedor.id = :proveedorId) " +
+              "AND (:estado IS NULL OR c.estado = :estado) " +
+              "ORDER BY c.fecha DESC")
+       List<Compra> filtrarSinFechas(@Param("proveedorId") Long proveedorId,
+                                   @Param("estado") EstadoCompra estado);
+
+       /**
+        * Compras CON filtro de fechas.
+        * NUNCA recibe null: el service normaliza antes de llamar.
+        */
+       @Query("SELECT c FROM Compra c JOIN FETCH c.proveedor " +
+              "WHERE c.fecha >= :fechaDesde " +
+              "AND c.fecha <= :fechaHasta " +
+              "AND (:proveedorId IS NULL OR c.proveedor.id = :proveedorId) " +
+              "AND (:estado IS NULL OR c.estado = :estado) " +
+              "ORDER BY c.fecha DESC")
+       List<Compra> filtrarEnRango(@Param("fechaDesde") LocalDateTime fechaDesde,
+                                   @Param("fechaHasta") LocalDateTime fechaHasta,
+                                   @Param("proveedorId") Long proveedorId,
+                                   @Param("estado") EstadoCompra estado);
 }
