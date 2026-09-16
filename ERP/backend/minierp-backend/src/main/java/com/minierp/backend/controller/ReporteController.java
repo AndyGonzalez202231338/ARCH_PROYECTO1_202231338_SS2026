@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -76,9 +77,13 @@ public class ReporteController {
     public ResponseEntity<List<ResumenVentasPeriodoResponse>> resumenVentas(
             @RequestParam(defaultValue = "MES") String agrupacion,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta) {
-        return ResponseEntity.ok(reporteService.resumenVentas(agrupacion, desde, hasta));
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+
+        LocalDateTime desdeDt = desde != null ? desde.atStartOfDay() : null;
+        LocalDateTime hastaDt = hasta != null ? hasta.atTime(23, 59, 59) : null;
+
+        return ResponseEntity.ok(reporteService.resumenVentas(agrupacion, desdeDt, hastaDt));
     }
 }

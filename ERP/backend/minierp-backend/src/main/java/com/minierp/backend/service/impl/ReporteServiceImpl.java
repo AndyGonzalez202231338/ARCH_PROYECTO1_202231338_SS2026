@@ -112,16 +112,20 @@ public class ReporteServiceImpl implements ReporteService {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<TopClienteResponse> topClientes(int top) {
+        @Override
+        @Transactional(readOnly = true)
+        public List<TopClienteResponse> topClientes(int top) {
         Pageable limit = PageRequest.of(0, top);
         return ventaRepository.findTopClientesPorMonto(limit).stream()
                 .map(r -> new TopClienteResponse(
-                        (Long) r[0], (String) r[1], 0L,
-                        (BigDecimal) r[2]))
+                        ((Number) r[0]).longValue(),
+                        (String) r[1],
+                        ((Number) r[2]).longValue(),        
+                        r[3] instanceof BigDecimal b
+                                ? b
+                                : BigDecimal.valueOf(((Number) r[3]).doubleValue())))
                 .toList();
-    }
+        }
 
     @Override
     @Transactional(readOnly = true)
@@ -133,15 +137,25 @@ public class ReporteServiceImpl implements ReporteService {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ResumenVentasPeriodoResponse> resumenVentas(
-            String agrupacion, LocalDateTime desde, LocalDateTime hasta) {
-        return ventaRepository.resumenVentasPorPeriodo(agrupacion, desde, hasta).stream()
+        @Override
+        @Transactional(readOnly = true)
+        public List<ResumenVentasPeriodoResponse> resumenVentas(
+                String agrupacion, LocalDateTime desde, LocalDateTime hasta) {
+
+        LocalDateTime d = desde != null ? desde : LocalDateTime.of(1900, 1, 1, 0, 0);
+        LocalDateTime h = hasta != null ? hasta : LocalDateTime.now().plusYears(100);
+
+        List<Object[]> resultados = switch (agrupacion == null ? "MES" : agrupacion.toUpperCase()) {
+                case "DIA"  -> ventaRepository.resumenVentasPorDia(d, h);
+                case "ANIO" -> ventaRepository.resumenVentasPorAnio(d, h);
+                default     -> ventaRepository.resumenVentasPorMes(d, h);
+        };
+
+        return resultados.stream()
                 .map(r -> new ResumenVentasPeriodoResponse(
                         (String) r[0],
                         ((Number) r[1]).longValue(),
                         (BigDecimal) r[2]))
                 .toList();
-    }
+        }
 }
