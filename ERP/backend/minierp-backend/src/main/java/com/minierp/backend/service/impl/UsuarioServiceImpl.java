@@ -56,24 +56,24 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public UsuarioResponse crear(UsuarioRequest request) {
-        // 1. Validar email único
+        // Validar email único
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new ConflictoException(
                     "Ya existe un usuario con el email: " + request.getEmail());
         }
 
-        // 2. Validar que el área exista
+        // Validar que el área exista
         Area area = areaRepository.findById(request.getAreaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Área no encontrada con id: " + request.getAreaId()));
 
-        // 3. Validar contraseña obligatoria en creación
+        // Validar contraseña obligatoria en creación
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new ReglaNegocioException(
                     "La contraseña es obligatoria al crear un usuario");
         }
 
-        // 4. Crear el usuario
+        // Crear el usuario
         Usuario nuevo = Usuario.builder()
                 .nombre(request.getNombre())
                 .email(request.getEmail())
@@ -84,7 +84,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario guardado = usuarioRepository.save(nuevo);
 
-        // 5. Auditar
+        // Auditar
         Usuario actor = usuarioActualHelper.getUsuarioActual();
         auditoriaService.registrar(actor, MODULO, "CREAR",
                 "Usuario creado con id " + guardado.getId()
@@ -100,19 +100,19 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Usuario no encontrado con id: " + id));
 
-        // 1. Validar email único si cambió
+        // Validar email único si cambió
         if (!existente.getEmail().equalsIgnoreCase(request.getEmail())
                 && usuarioRepository.existsByEmail(request.getEmail())) {
             throw new ConflictoException(
                     "Ya existe otro usuario con el email: " + request.getEmail());
         }
 
-        // 2. Validar área
+        // Validar área
         Area area = areaRepository.findById(request.getAreaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Área no encontrada con id: " + request.getAreaId()));
 
-        // 3. Actualizar campos (NO se toca la contraseña aquí)
+        // Actualizar campos (NO se toca la contraseña aquí)
         existente.setNombre(request.getNombre());
         existente.setEmail(request.getEmail());
         existente.setArea(area);
@@ -122,7 +122,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         Usuario actualizado = usuarioRepository.save(existente);
 
-        // 4. Auditar
+        // Auditar
         Usuario actor = usuarioActualHelper.getUsuarioActual();
         auditoriaService.registrar(actor, MODULO, "ACTUALIZAR",
                 "Usuario actualizado con id " + actualizado.getId());

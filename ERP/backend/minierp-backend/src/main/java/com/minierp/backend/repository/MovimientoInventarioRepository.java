@@ -14,9 +14,7 @@ import java.util.List;
 
 public interface MovimientoInventarioRepository extends JpaRepository<MovimientoInventario, Long> {
 
-    // =========================================================
-    // UEPS / PEPS — Lotes disponibles con bloqueo pesimista
-    // =========================================================
+    // UEPS / PEPS Lotes disponibles con bloqueo pesimista
 
     /**
      * Obtiene las ENTRADAS de un producto con saldo disponible > 0,
@@ -47,10 +45,6 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
            "AND m.saldoDisponible > 0 " +
            "ORDER BY m.fecha DESC, m.id DESC")
     List<MovimientoInventario> findLotesDisponiblesUEPS(@Param("productoId") Long productoId);
-
-    // =========================================================
-    // Stock actual (suma de saldos disponibles)
-    // =========================================================
 
     /**
      * Stock actual de un producto: suma de saldos disponibles
@@ -122,10 +116,6 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
             @Param("fechaDesde") LocalDateTime fechaDesde,
             @Param("fechaHasta") LocalDateTime fechaHasta,
             Pageable pageable);
-
-    // =========================================================
-    // Movimientos por tipo y por referencia
-    // =========================================================
 
     /**
      * Movimientos de un tipo específico SIN rango de fechas.

@@ -106,7 +106,7 @@ public class InventarioServiceImpl implements InventarioService {
             throw new ReglaNegocioException("La cantidad debe ser mayor a cero");
         }
 
-        // -------- PASO 1: Validar stock --------
+        // Validar stock 
         int stockTotal = calcularStockActual(producto.getId());
         if (stockTotal < cantidad) {
             throw new ReglaNegocioException(
@@ -114,19 +114,19 @@ public class InventarioServiceImpl implements InventarioService {
                     + ". Disponible: " + stockTotal + ", solicitado: " + cantidad);
         }
 
-        // -------- PASO 2: Determinar método --------
+        // Determinar método 
         // Paridad del ID del usuario que registra la venta
         boolean usaPEPS = usuario.getId() % 2 == 0;
         String metodo = usaPEPS ? "PEPS" : "UEPS";
 
-        // -------- PASO 3: Obtener lotes bloqueados --------
+        // Obtener lotes bloqueados
         // El repositorio usa @Lock(PESSIMISTIC_WRITE) para bloquear
         // las filas y evitar condiciones de carrera.
         List<MovimientoInventario> lotes = usaPEPS
                 ? movimientoRepository.findLotesDisponiblesPEPS(producto.getId())
                 : movimientoRepository.findLotesDisponiblesUEPS(producto.getId());
 
-        // -------- PASO 4 y 5: Consumir lotes y acumular costo --------
+        // Consumir lotes y acumular costo
         int restante = cantidad;
         BigDecimal costoTotal = BigDecimal.ZERO;
         List<MovimientoInventario> lotesModificados = new ArrayList<>();
@@ -157,7 +157,7 @@ public class InventarioServiceImpl implements InventarioService {
         // Guardar los lotes modificados
         movimientoRepository.saveAll(lotesModificados);
 
-        // -------- PASO 6: Crear movimiento de SALIDA --------
+        // Crear movimiento de SALIDA 
         // Costo unitario promedio ponderado de la salida
         BigDecimal costoUnitarioPromedio = costoTotal
                 .divide(BigDecimal.valueOf(cantidad), 2, RoundingMode.HALF_UP);
@@ -180,7 +180,7 @@ public class InventarioServiceImpl implements InventarioService {
 
         MovimientoInventario guardado = movimientoRepository.save(salida);
 
-        // -------- PASO 7: Actualizar stock desnormalizado --------
+        // -Actualizar stock desnormalizado
         producto.setStockActual(stockNuevo);
         productoRepository.save(producto);
 

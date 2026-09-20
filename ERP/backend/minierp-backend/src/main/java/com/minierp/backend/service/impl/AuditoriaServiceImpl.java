@@ -23,7 +23,7 @@ public class AuditoriaServiceImpl implements AuditoriaService {
      * Usamos Propagation.REQUIRES_NEW para que la auditoría se guarde
      * incluso si la transacción principal hace rollback.
      *
-     * ⚠️ MUY IMPORTANTE:
+     * MUY IMPORTANTE:
      * Si usáramos REQUIRED (por defecto), un fallo en el service principal
      * haría rollback también del log, y perderíamos la evidencia de la
      * operación que intentó hacerse. Por eso forzamos una transacción

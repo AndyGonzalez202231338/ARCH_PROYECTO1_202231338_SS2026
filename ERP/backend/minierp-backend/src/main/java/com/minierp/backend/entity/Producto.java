@@ -99,8 +99,6 @@ public class Producto {
         return stockActual != null && stockActual >= cantidad;
     }
 
-    // ------- equals/hashCode -------
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

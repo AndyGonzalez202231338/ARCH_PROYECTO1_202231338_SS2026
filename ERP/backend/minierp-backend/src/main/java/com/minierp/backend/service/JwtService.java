@@ -37,10 +37,7 @@ public class JwtService {
     @Value("${jwt.expiration-ms:3600000}")   // 1 hora por defecto
     private long expirationMs;
 
-    // =========================================================
     // GENERACIÓN DEL TOKEN
-    // =========================================================
-
     public String generateToken(UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", extraerRolPrincipal(user));
@@ -72,10 +69,7 @@ public class JwtService {
                 .orElse("ROLE_USER");
     }
 
-    // =========================================================
     // EXTRACCIÓN DE CLAIMS
-    // =========================================================
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -101,10 +95,7 @@ public class JwtService {
                 .getPayload();                 // Reemplaza a getBody()
     }
 
-    // =========================================================
     // VALIDACIÓN
-    // =========================================================
-
     public boolean isTokenValid(String token, UserDetails user) {
         try {
             final String username = extractUsername(token);
