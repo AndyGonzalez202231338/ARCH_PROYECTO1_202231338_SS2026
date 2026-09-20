@@ -14,13 +14,20 @@
         {{ puedeEditar() ? 'Administra los productos del catálogo' : 'Consulta los productos del catálogo' }}
       </p>
     </div>
-
+      @if (puedeEditar()) {
+    <button type="button" 
+            class="px-5 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary transition-all duration-300 shadow-sm hover:shadow focus:outline-none focus:ring-4 focus:ring-erp-secondary/30 shrink-0"
+            (click)="abrirCategorias.set(true)">
+      Gestionar Categorías
+    </button>
+  }
     <button *ngIf="puedeEditar()" type="button"
             class="px-5 py-2.5 bg-erp-secondary text-erp-card font-bold rounded-lg hover:bg-erp-primary transition-all duration-300 shadow-sm hover:shadow focus:outline-none focus:ring-4 focus:ring-erp-secondary/30 shrink-0"
             (click)="nuevoProducto()">
       + Nuevo Producto
     </button>
   </div>
+
 
   <!-- Filtros -->
   <div class="flex flex-wrap items-center gap-3 bg-erp-card border border-erp-border rounded-xl p-3 shadow-sm">
@@ -210,6 +217,14 @@
     </div>
   </div>
 </div>
+
+@if (abrirCategorias()) {
+  <app-categoria-modal
+    (cerrado)="abrirCategorias.set(false)"
+    (cambio)="onCategoriaCambiada()">
+  </app-categoria-modal>
+}
+
 
 <app-confirm-dialog
   [open]="!!productoParaCambiarEstado()"

@@ -3,3 +3,8 @@ export interface CategoriaResponse {
   nombre: string;
   descripcion?: string;
 }
+
+export interface CategoriaRequest {
+  nombre: string;
+  descripcion?: string;
+}

@@ -8,7 +8,7 @@ export interface StockProductoRaw {
   bajoStock: boolean;
 }
 
-/** Enriquecido en el service — lo que consumen los componentes */
+/** Enriquecido en el service lo que consumen los componentes */
 export interface StockProductoResponse {
   productoId: number;
   codigo: string;

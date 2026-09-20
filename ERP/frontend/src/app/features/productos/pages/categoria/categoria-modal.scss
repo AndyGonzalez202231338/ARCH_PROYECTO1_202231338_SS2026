@@ -1,0 +1,295 @@
+// =========================================================
+// VARIABLES (según la paleta del proyecto)
+// =========================================================
+$color-primary:       #0d3b2e;
+$color-primary-hover: #1a5f4a;
+$color-accent:        #4ade80;
+$color-bg:            #f5f7fa;
+$color-surface:       #ffffff;
+$color-text:          #1f2937;
+$color-text-muted:    #6b7280;
+$color-border:        #e5e7eb;
+$color-danger:        #ef4444;
+$color-success:       #10b981;
+$radius:              10px;
+$shadow-modal:        0 20px 40px rgba(0, 0, 0, 0.2);
+
+// =========================================================
+// OVERLAY (fondo oscuro detrás del modal)
+// =========================================================
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 180ms ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// =========================================================
+// MODAL
+// =========================================================
+.modal {
+  background: $color-surface;
+  border-radius: $radius;
+  box-shadow: $shadow-modal;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 220ms ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+// =========================================================
+// HEADER
+// =========================================================
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid $color-border;
+  background: $color-surface;
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $color-text;
+    letter-spacing: -0.01em;
+  }
+}
+
+.modal__close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: $color-text-muted;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  transition: background 150ms ease, color 150ms ease;
+
+  &:hover {
+    background: $color-bg;
+    color: $color-text;
+  }
+}
+
+// =========================================================
+// BODY (con scroll interno si hace falta)
+// =========================================================
+.modal__body {
+  padding: 20px 24px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+// =========================================================
+// FORMULARIO
+// =========================================================
+.cat-form {
+  background: $color-bg;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $color-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $color-text;
+  }
+
+  input {
+    width: 100%;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: $color-text;
+    background: $color-surface;
+    border: 1px solid $color-border;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+
+    &::placeholder { color: $color-text-muted; }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba(13, 59, 46, 0.1);
+    }
+
+    &.ng-invalid.ng-touched {
+      border-color: $color-danger;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+  }
+}
+
+.cat-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+// =========================================================
+// BOTONES
+// =========================================================
+.btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn--primary {
+  background: $color-primary;
+  color: #fff;
+
+  &:hover:not(:disabled) { background: $color-primary-hover; }
+}
+
+.btn--ghost {
+  background: transparent;
+  color: $color-text;
+  border-color: $color-border;
+
+  &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.03); }
+}
+
+.btn--secondary {
+  background: $color-surface;
+  color: $color-text;
+  border-color: $color-border;
+
+  &:hover:not(:disabled) { background: $color-bg; }
+}
+
+// =========================================================
+// TABLA
+// =========================================================
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead th {
+    text-align: left;
+    padding: 10px 12px;
+    background: $color-bg;
+    color: $color-text-muted;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid $color-border;
+  }
+
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid $color-border;
+    color: $color-text;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  tbody tr:hover { background: $color-bg; }
+}
+
+.text-center { text-align: center; color: $color-text-muted; }
+
+// =========================================================
+// BOTÓN DE ACCIÓN (dentro de la tabla)
+// =========================================================
+.action-btn {
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $color-primary;
+  background: transparent;
+  border: 1px solid $color-border;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+
+  &:hover {
+    background: rgba(13, 59, 46, 0.06);
+    border-color: $color-primary;
+  }
+}
+
+// =========================================================
+// RESPONSIVE
+// =========================================================
+@media (max-width: 640px) {
+  .modal-overlay { padding: 12px; }
+
+  .modal { max-height: 95vh; }
+
+  .modal__body { padding: 16px; }
+
+  .cat-table thead { display: none; }
+
+  .cat-table tbody tr {
+    display: block;
+    padding: 12px;
+    border: 1px solid $color-border;
+    border-radius: 8px;
+    margin-bottom: 8px;
+
+    td {
+      display: flex;
+      justify-content: space-between;
+      border: none;
+      padding: 4px 0;
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../../../core/config/api.config';
-import { CategoriaResponse } from '../models/categoria.model';
+import { CategoriaRequest, CategoriaResponse } from '../models/categoria.model';
 
 const BASE = `${API_BASE_URL}/api/admin/categorias`;
 
@@ -16,5 +16,13 @@ export class CategoriaService {
 
   listar(): Observable<CategoriaResponse[]> {
     return this.http.get<CategoriaResponse[]>(BASE);
+  }
+
+  crear(req: CategoriaRequest): Observable<CategoriaResponse> {
+    return this.http.post<CategoriaResponse>(BASE, req);
+  }
+
+  actualizar(id: number, req: CategoriaRequest): Observable<CategoriaResponse> {
+    return this.http.put<CategoriaResponse>(`${BASE}/${id}`, req);
   }
 }

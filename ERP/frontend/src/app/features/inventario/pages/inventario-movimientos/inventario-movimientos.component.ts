@@ -54,7 +54,6 @@ export class InventarioMovimientosComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.puedeVerMovimientos()) {
-      // 👇 Ajusta el método al que realmente tenga tu NotificationService
       this.notifications.warning('No tienes permisos para ver movimientos');
       this.router.navigate(['/inventario']);
       return;

@@ -1,0 +1,38 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Diagrama de Despliegue" id="diagrama_despliegue">
+    <mxGraphModel dx="1497" dy="1022" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="d1" parent="1" style="shape=cube;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontStyle=1;fontSize=14;align=center;verticalAlign=top;spacingTop=8;size=14;" value="Equipo Cliente &lt;&lt;device&gt;&gt;" vertex="1">
+          <mxGeometry height="260" width="360" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" parent="d1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontSize=11;align=left;verticalAlign=top;spacing=6;" value="«artifact»&lt;br&gt;&lt;b&gt;Navegador Web&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;Frontend Angular (SPA)&lt;br&gt;Consume la API REST&lt;br&gt;Almacena el JWT (localStorage)" vertex="1">
+          <mxGeometry height="150" width="300" x="30" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" parent="1" style="shape=cube;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontStyle=1;fontSize=14;align=center;verticalAlign=top;spacingTop=8;size=14;" value="Servidor de Aplicaciones &lt;&lt;device&gt;&gt;" vertex="1">
+          <mxGeometry height="300" width="400" x="570" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" parent="d3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontSize=11;align=left;verticalAlign=top;spacing=6;" value="«artifact»&lt;br&gt;&lt;b&gt;minierp-backend.jar&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;Spring Boot + Tomcat embebido&lt;br&gt;Puerto: 8080&lt;br&gt;Controllers (REST)&lt;br&gt;Services / Repositories (JPA)&lt;br&gt;Spring Security + Filtro JWT&lt;br&gt;Flyway (migraciones BD)" vertex="1">
+          <mxGeometry height="190" width="340" x="30" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" parent="1" style="shape=cube;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontStyle=1;fontSize=14;align=center;verticalAlign=top;spacingTop=8;size=14;" value="Servidor de Base de Datos &lt;&lt;device&gt;&gt;" vertex="1">
+          <mxGeometry height="260" width="380" x="1140" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="d6" parent="d5" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontSize=11;align=left;verticalAlign=top;spacing=6;" value="«DBMS»&lt;br&gt;&lt;b&gt;PostgreSQL 14&lt;/b&gt;&lt;hr size=&#39;1&#39;&gt;Base de datos: minierp&lt;br&gt;Puerto: 5432&lt;br&gt;Esquema gestionado por Flyway" vertex="1">
+          <mxGeometry height="150" width="320" x="30" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d7" edge="1" parent="1" source="d1" style="endArrow=none;dashed=1;html=1;fontSize=11;strokeColor=#000000;labelBackgroundColor=#ffffff;" target="d3" value="«HTTP/HTTPS» REST + JSON Bearer JWT :8080">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="d8" edge="1" parent="1" source="d3" style="endArrow=none;dashed=1;html=1;fontSize=11;strokeColor=#000000;labelBackgroundColor=#ffffff;" target="d5" value="«JDBC» PostgreSQL Driver :5432">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

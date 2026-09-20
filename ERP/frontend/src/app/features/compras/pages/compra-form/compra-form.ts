@@ -214,10 +214,6 @@ export class CompraForm {
 
     this.guardando.set(true);
 
-    // El backend actual solo expone registrar() (POST) y cambiarEstado();
-    // no hay un endpoint de actualización de detalles todavía. En modo
-    // edición se vuelve a registrar como referencia — ajusta esto cuando
-    // el backend exponga un PUT /api/admin/compras/{id}.
     this.compraService.registrar(request).subscribe({
       next: () => {
         this.guardando.set(false);

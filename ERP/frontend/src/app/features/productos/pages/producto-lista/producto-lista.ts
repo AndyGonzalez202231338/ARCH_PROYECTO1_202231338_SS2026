@@ -9,6 +9,7 @@ import { CategoriaService } from '../../services/categoria.service';
 import { ProductoService } from '../../services/producto.service';
 import { CategoriaResponse } from '../../models/categoria.model';
 import { ProductoResponse } from '../../models/producto.model';
+import { CategoriaModal } from '../categoria/categoria-modal.component';
 
 type EstadoFiltro = 'todos' | 'activos' | 'inactivos';
 
@@ -16,7 +17,7 @@ const PAGE_SIZE = 10;
 
 @Component({
   selector: 'app-producto-lista',
-  imports: [CommonModule, Toast, ConfirmDialog],
+  imports: [CommonModule, Toast, ConfirmDialog, CategoriaModal],
   templateUrl: './producto-lista.html',
   styleUrl: './producto-lista.scss',
 })
@@ -31,6 +32,9 @@ export class ProductoLista {
   readonly puedeEditar = computed(() => this.permissions.canWrite('productos'));
 
   readonly categorias = signal<CategoriaResponse[]>([]);
+
+  // --- Categoria Modal ---
+  readonly abrirCategorias = signal(false);
 
   // --- Estado ---
   readonly productos = signal<ProductoResponse[]>([]);
@@ -218,5 +222,10 @@ export class ProductoLista {
 
   trackByProductoId(_index: number, producto: ProductoResponse): number {
     return producto.id;
+  }
+
+  onCategoriaCambiada(): void {
+    // Recargar el combo de categorías
+    this.categoriaService.listar().subscribe(data => this.categorias.set(data));
   }
 }
