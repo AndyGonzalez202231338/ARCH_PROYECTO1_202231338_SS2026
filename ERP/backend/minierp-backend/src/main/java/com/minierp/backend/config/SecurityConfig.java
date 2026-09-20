@@ -35,9 +35,8 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final ObjectMapper objectMapper;
 
-    // =========================================================
+
     // CORS
-    // =========================================================
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -45,7 +44,7 @@ public class SecurityConfig {
                 "http://localhost:4200",
                 "http://127.0.0.1:4200"
         ));
-        // 👇 NUEVO: PATCH es obligatorio para activar/desactivar usuarios
+        // PATCH es obligatorio para activar/desactivar usuarios
         configuration.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
@@ -57,27 +56,19 @@ public class SecurityConfig {
         return source;
     }
 
-    // =========================================================
     // PASSWORD ENCODER
-    // =========================================================
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // =========================================================
     // AUTHENTICATION MANAGER
-    // =========================================================
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration
     ) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-    // =========================================================
-    // MANEJO DE ERRORES DE SEGURIDAD (JSON en lugar de HTML)
-    // =========================================================
 
     /**
      * Se ejecuta cuando un usuario NO autenticado intenta acceder
@@ -115,9 +106,7 @@ public class SecurityConfig {
         objectMapper.writeValue(response.getWriter(), body);
     }
 
-    // =========================================================
     // FILTER CHAIN
-    // =========================================================
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -125,7 +114,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // 👇 NUEVO: manejo de errores con JSON
+            //manejo de errores con JSON
             .exceptionHandling(ex -> ex
                     .authenticationEntryPoint(authenticationEntryPoint())
                     .accessDeniedHandler(accessDeniedHandler())

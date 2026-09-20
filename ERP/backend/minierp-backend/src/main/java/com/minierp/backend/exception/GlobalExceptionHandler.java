@@ -20,10 +20,7 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // =========================================================
     // SEGURIDAD
-    // =========================================================
-
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException ex, HttpServletRequest request) {
@@ -51,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * NUEVO: se lanza cuando un usuario autenticado no tiene permisos
+     * Se lanza cuando un usuario autenticado no tiene permisos
      * para ejecutar una acción (@PreAuthorize falla).
      * Sin este handler, Spring devolvería un 500 genérico.
      */
@@ -67,10 +64,6 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
-
-    // =========================================================
-    // VALIDACIÓN
-    // =========================================================
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
@@ -89,10 +82,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
-    // =========================================================
-    // EXCEPCIONES DE NEGOCIO (NUEVAS)
-    // =========================================================
-
+    // EXCEPCIONES DE LOGICA DE NEGOCIO
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(
             RecursoNoEncontradoException ex, HttpServletRequest request) {
@@ -131,10 +121,6 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
-
-    // =========================================================
-    // FALLBACK
-    // =========================================================
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(

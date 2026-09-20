@@ -138,10 +138,6 @@ public class Venta {
     @Builder.Default
     private List<DetalleVenta> detalles = new ArrayList<>();
 
-    // =========================================================
-    // CALLBACKS JPA
-    // =========================================================
-
     @PrePersist
     public void prePersist() {
         if (fecha == null) {
@@ -154,10 +150,6 @@ public class Venta {
     public void preUpdate() {
         recalcularTotales();
     }
-
-    // =========================================================
-    // MÉTODOS DE UTILIDAD
-    // =========================================================
 
     /**
      * Agrega un detalle manteniendo la relación bidireccional.
@@ -215,9 +207,6 @@ public class Venta {
         return EstadoVenta.ANULADA.equals(this.estado);
     }
 
-    // =========================================================
-    // equals y hashCode
-    // =========================================================
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

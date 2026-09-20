@@ -1,0 +1,55 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal__header">
+      <h2>Gestión de Categorías</h2>
+      <button class="modal__close" (click)="cerrar()">×</button>
+    </header>
+
+    <div class="modal__body">
+      <!-- Formulario -->
+      <form [formGroup]="form" (ngSubmit)="guardar()" class="cat-form">
+        <h3>{{ editandoId() ? 'Editar categoría' : 'Nueva categoría' }}</h3>
+
+        <div class="field">
+          <label>Nombre *</label>
+          <input formControlName="nombre" maxlength="80" />
+        </div>
+
+        <div class="field">
+          <label>Descripción</label>
+          <input formControlName="descripcion" maxlength="255" />
+        </div>
+
+        <div class="cat-form__actions">
+          @if (editandoId()) {
+            <button type="button" class="btn btn--ghost" (click)="nueva()">Cancelar</button>
+          }
+          <button type="submit" class="btn btn--primary" [disabled]="guardando()">
+            {{ editandoId() ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+
+      <!-- Listado -->
+      <table class="cat-table">
+        <thead>
+          <tr><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr>
+        </thead>
+        <tbody>
+          @for (c of categorias(); track c.id) {
+            <tr>
+              <td>{{ c.nombre }}</td>
+              <td>{{ c.descripcion || '—' }}</td>
+              <td>
+                <button class="action-btn" (click)="editar(c)">Editar</button>
+              </td>
+            </tr>
+          }
+          @if (categorias().length === 0 && !cargando()) {
+            <tr><td colspan="3" class="text-center">No hay categorías</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

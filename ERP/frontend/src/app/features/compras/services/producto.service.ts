@@ -11,10 +11,7 @@ const BASE = `${API_BASE_URL}/api/admin/productos`;
 /**
  * Consume ProductoController (GET es isAuthenticated(), cualquier rol).
  * Solo se implementan listar/obtener aquí porque es lo que necesita el
- * módulo de Compras (selector de productos activos). El módulo de
- * Productos ya tiene su propio ProductoMockService pendiente de
- * conectar; si ya tienes un ProductoService real en tu proyecto, usa
- * ese en su lugar.
+ * módulo de Compras (selector de productos activos).
  */
 @Injectable({ providedIn: 'root' })
 export class ProductoService {

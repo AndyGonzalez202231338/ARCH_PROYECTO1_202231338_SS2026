@@ -21,9 +21,9 @@ import java.util.List;
  * Filtro que se ejecuta una vez por petición HTTP.
  *
  * Extrae el JWT del header Authorization, valida su firma y expiración,
- * y — si es válido — coloca la autenticación en el SecurityContext.
+ * y coloca la autenticación en el SecurityContext.
  *
- * IMPORTANTE: este filtro YA NO consulta la base de datos.
+ * Este filtro YA NO consulta la base de datos.
  * El rol viene dentro del propio token (claim "role"), firmado por
  * el servidor. Esto elimina 1 SELECT por cada request autenticado.
  */
