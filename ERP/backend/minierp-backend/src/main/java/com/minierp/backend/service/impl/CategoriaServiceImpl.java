@@ -85,9 +85,7 @@ public class CategoriaServiceImpl implements CategoriaService {
                 "No se puede eliminar la categoría porque tiene productos asociados");
         }
         // Regla de negocio: no eliminar si tiene productos asociados.
-        // El PDF dice que la información histórica debe conservarse.
-        // Aquí se valida con una consulta al repositorio de productos.
-        // Como es un detalle no trivial, se explica abajo.
+        
         categoriaRepository.deleteById(id);
     }
 
