@@ -34,11 +34,6 @@ public class Area {
     @Column(length = 255)
     private String descripcion;
 
-    // Si luego quieres navegar desde Area hacia Usuarios:
-    // @OneToMany(mappedBy = "area", fetch = FetchType.LAZY)
-    // @Builder.Default
-    // private List<Usuario> usuarios = new ArrayList<>();
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
